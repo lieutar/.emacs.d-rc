@@ -1,14 +1,20 @@
 (rc-ext
  :autoload '(script-fu-mode
              script-fu-other-window)
- :load
- (lambda ()
-   (load "c:/cygwin/home/lieutar/work/script-fu-shell/script-fu.el"))
+ :get
+ (lambda () (browse-url "https://github.com/sonota/script-fu-shell"))
+ :load 'script-fu
  :init
  (lambda ()
    (setq script-fu:use-eldoc t)
    (setq script-fu:use-anything t)
    (setq script-fu:use-auto-complete t)
    (setq script-fu-program-name
-         "c:/cygwin/home/lieutar/work/script-fu-shell/script-fu-shell.rb"))
+         (concat (replace-regexp-in-string
+                  "[^\\\\/]+$"
+                  ""
+                  (locate-library "script-fu")
+                  )
+                 "script-fu-shell.rb")))
  )
+

@@ -3,6 +3,7 @@
 (setq-default make-backup-files nil)
 (setq-default indent-tabs-mode nil)
 (setq inhibit-startup-message t) 
+(setq scroll-step 1)
 
 (setq load-path
 
@@ -31,5 +32,3 @@
 
 
 
-  
-(setq scroll-step 1)

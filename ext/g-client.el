@@ -21,8 +21,5 @@
 
  :init
  (lambda ()
-   (setq g-user-email "lieutar@1dk.jp")
-   (setq gcal-user-email "lieutar@1dk.jp")
-   (setq gblogger-user-email "lieutar@1dk.jp")
    ))
 
