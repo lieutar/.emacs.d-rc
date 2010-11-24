@@ -7,20 +7,25 @@
 (setq load-path
 
       (append
-       (list
-        (expand-file-name "~/share/emacs/site-lisp")
-        )
 
-       (let ((work (expand-file-name "~/work/emacs")))
-         (when (file-readable-p work)
-           (apply 'append
-                  (mapcar
-                   (lambda (file)
-                     (unless (string-match "^\\.+$" file)
-                       (let ((full (expand-file-name (concat work "/" file))))
-                         (when (file-directory-p full)
-                           (list full)))))
-                   (directory-files work)))))
+       (apply
+        'append
+        (mapcar
+         (lambda (work)
+           (when (file-readable-p work)
+             (apply 'append
+                    (list work)
+                    (mapcar
+                     (lambda (file)
+                       (unless (string-match "^\\.+$" file)
+                         (let ((full (expand-file-name (concat work "/" file))))
+                           (when (file-directory-p full)
+                             (list full)))))
+                     (directory-files work)))))
+         (list
+          (expand-file-name "~/share/emacs/site-lisp")
+          (expand-file-name "~/work/emacs")
+          )))
 
        load-path))
 
