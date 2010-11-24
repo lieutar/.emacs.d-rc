@@ -1,10 +1,6 @@
-(setq hatena-user-alist '(("lieutar" . "shellfish")
-                          ("lieutax" . "shellfish")))
-
 (require 'url)
-;;(require 'base64)
 
-(assoc "h.hatena.ne.jp:80" (symbol-value url-basic-auth-storage))
+
 (defvar   hatena-user-alist   nil)
 (defvar   hatena-default-user-name (and hatena-user-alist
                                         (caar hatena-user-alist)))

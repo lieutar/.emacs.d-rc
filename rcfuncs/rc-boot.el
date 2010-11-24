@@ -35,6 +35,7 @@
                           "ext"
                           "funcs"
                           "projects"
+                          "private"
                           "last"
 
                           ))
