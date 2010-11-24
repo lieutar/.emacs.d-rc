@@ -25,11 +25,11 @@
 
      ((<= 90 width)
       (elscreen-create)
-      (split-window-horizontally 85)
+      ;;(split-window-horizontally 85)
       (elscreen-create)
-      (split-window-horizontally 85)
+      ;;(split-window-horizontally 85)
       (elscreen-create)
-      (split-window-horizontally 85)
+      ;;(split-window-horizontally 85)
       (elscreen-next)
       ))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
