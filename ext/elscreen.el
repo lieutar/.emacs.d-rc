@@ -7,6 +7,7 @@
  :preload
  (lambda ()
    (setq elscreen-prefix-key (kbd "C-t"))
+   (setq elscreen-display-tab nil)
    )
  :get
  (lambda ()
