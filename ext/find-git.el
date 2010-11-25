@@ -19,6 +19,9 @@
       "~/Desktop"
       "~/work/build"
       "~/work/pending"
+      "~/work/codereading"
+      "~/share/emacs"
+      "~/local"
       )
 
     find-git-include-pathes-list
