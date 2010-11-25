@@ -1,6 +1,7 @@
 (rc-ext
  :name 'find-git
  :autoload 'find-git
+ :get "https://github.com/lieutar/find-git.el/raw/master/find-git.el"
  :init
  (lambda ()
    (setq
