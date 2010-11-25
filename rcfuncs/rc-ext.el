@@ -147,11 +147,13 @@
          nil)))))
 
 (defvar rc-ext-classes-alist ())
+(defvar rc-ext-current-class nil)
 
 (defun rc-ext (&rest args)
   (let* ((name     (plist-get args :name    ))
          (funcs    (plist-get args :autoload))
          (class    (plist-get args :class   ))
+         (rc-ext-current-class class)
          (path     (plist-get args :path    ))
          (load     (or (plist-get args :load)
                        name
@@ -162,14 +164,15 @@
          (preload  (or (plist-get args :preload )
                        (lambda ())))
 
-         (body    `(rc-ext-internal
-                    ,path
-                    ,(if (symbolp load)
-                         `(lambda () (require ',load)) (or load (lambda ())))
-                    ,(if (stringp get)
-                         `(lambda () (rc-get ,get))    (or get  (lambda ())))
-                    ,(or init (lambda ()))
-                    t))
+         (body    `(let ((rc-ext-current-class ,class))
+                     (rc-ext-internal
+                      ,path
+                      ,(if (symbolp load)
+                           `(lambda () (require ',load)) (or load (lambda ())))
+                      ,(if (stringp get)
+                           `(lambda () (rc-get ,get))    (or get  (lambda ())))
+                      ,(or init (lambda ()))
+                      t)))
 
          (exec      (and
                      (apply (or (plist-get args :cond)

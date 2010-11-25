@@ -5,10 +5,10 @@
 (setq inhibit-startup-message t) 
 (setq scroll-step 1)
 
+
 (setq load-path
 
       (append
-
        (apply
         'append
         (mapcar
@@ -19,7 +19,8 @@
                     (mapcar
                      (lambda (file)
                        (unless (string-match "^\\.+$" file)
-                         (let ((full (expand-file-name (concat work "/" file))))
+                         (let ((full (expand-file-name
+                                      (concat work "/" file))))
                            (when (file-directory-p full)
                              (list full)))))
                      (directory-files work)))))
