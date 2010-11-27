@@ -1,8 +1,16 @@
 (rc-ext
- :load
- (if (rc-emacsen-match "fsf-unicom-@") 'gnuserv-compat 'gnuserv)
+ :cond (lambda ())
+ :load (rc-emacsen-case
+        (meadow-@-@ 'gnuserv)
+        (t          'gnuserv-compat))
  :get
- (lambda () (browser-url "http://shimooku.hp.infoseek.co.jp/gnuserv.html"))
+ (lambda ()
+   (browse-url
+    (rc-emacsen-case
+     (@-nt-@
+      "http://www.wyrdrune.com/index.html?gnuserv.html")
+     (t
+      "http://www.hpl.hp.com/personal/ange/gnuserv/home.html"))))
  :init
  (lambda () (gnuserv-start))
 )

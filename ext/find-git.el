@@ -7,7 +7,7 @@
 
     find-git-exclude-patterns-list
     '(
-      "/\\..*"
+      "/\\.[^/]+\\'"
       "/rc/site-lisp\\."
       "/\\.emacs\\.d/elpa"
       )
@@ -32,6 +32,7 @@
     find-git-nested-tree-list
     '(
       "~"
+      "~/.emacs.d"
       )
     
     )

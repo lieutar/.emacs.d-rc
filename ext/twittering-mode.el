@@ -1,7 +1,7 @@
 (rc-ext
  :load 'twittering-mode
  :autoload 'twit
- :get  "http://github.com/hayamiz/twittering-mode/raw/master/twittering-mode.el"
+;; :get  "http://github.com/hayamiz/twittering-mode/raw/master/twittering-mode.el"
  :init
  (lambda ()
    (require 'cl)
@@ -15,11 +15,13 @@
    '(("F" twittering-favorite)
      ("R" twittering-retweet))))
    (add-hook 'twittering-mode-hook 'my-twittering-mode-hook)
-   (rc-emacsen-match
+   (rc-emacsen-case
     (meadow-nt-22
      (setq twittering-connection-type-order
-           '(wget native))
+           '(
+             ;;curl
+             wget
+             native
+             ))
      ))
    ))
-
-
