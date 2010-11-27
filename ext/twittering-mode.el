@@ -1,7 +1,7 @@
 (rc-ext
  :load 'twittering-mode
  :autoload 'twit
-;; :get  "http://github.com/hayamiz/twittering-mode/raw/master/twittering-mode.el"
+ :get  "http://github.com/hayamiz/twittering-mode/raw/master/twittering-mode.el"
  :init
  (lambda ()
    (require 'cl)
