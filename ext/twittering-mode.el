@@ -15,6 +15,11 @@
    '(("F" twittering-favorite)
      ("R" twittering-retweet))))
    (add-hook 'twittering-mode-hook 'my-twittering-mode-hook)
+   (rc-emacsen-match
+    (meadow-nt-22
+     (setq twittering-connection-type-order
+           '(wget native))
+     ))
    ))
 
 

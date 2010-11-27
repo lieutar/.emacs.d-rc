@@ -1,3 +1,6 @@
+;;; テキトーなキーマップに vi っぽいキーバインドにするよ
+;;; 競合するものがあると M-* に置き換えるよ
+
 (defun rc-vise-km (keymap &optional prefix)
   (let* ((prefix (or prefix (kbd "C-c")))
          (premap (or (lookup-key keymap prefix)

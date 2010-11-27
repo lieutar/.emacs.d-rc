@@ -7,9 +7,9 @@
 
     find-git-exclude-patterns-list
     '(
-      "~/\.\.*"
+      "/\\..*"
       "/rc/site-lisp\\."
-      "/\\.mozilla"
+      "/\\.emacs\\.d/elpa"
       )
 
     find-git-exclude-pathes-list

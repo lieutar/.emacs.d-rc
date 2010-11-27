@@ -1,3 +1,5 @@
+;;; ぐぐるコマンド
+
 (defun googling-uri-encode (str &optional coding-system)
   "Encode string according to Percent-Encoding defined in RFC 3986."
   (let ((coding-system (or (when (and coding-system
@@ -22,10 +24,15 @@
 
 
 (defun googling-region (begin end)
-  (interactive (list (region-beginning)
-                     (region-end)))
-  (let* ((query (buffer-substring-no-properties begin end))
-         (url   (format "http://google.com/search?q=%s"
+  (interactive "r")
+  (googling (buffer-substring-no-properties begin end)))
+
+
+(defun googling (query)
+  (interactive (list (if mark-active
+                         (buffer-substring-no-properties(region-beginning)
+                                                        (region-end))
+                       (read-string "google: "))))
+  (let* ((url   (format "http://google.com/search?q=%s"
                         (googling-uri-encode query))))
     (browse-url url)))
-

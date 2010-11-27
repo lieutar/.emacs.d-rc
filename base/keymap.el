@@ -18,7 +18,9 @@
   (define-key km [?t]    'org-remember-code-to-do)
 
   (define-key km [?\C-f] 'my-find-lib)
-  (define-key km [?G]    'my-git-status)
+  (define-key km [?G]    'googling)
+  (define-key km [?\C-t] 'excite-translate)
+  (define-key km [?\M-g] 'my-git-status)
 
   (setq my-ctrl-z-map km)
   (global-set-key my-km-prefix km))
