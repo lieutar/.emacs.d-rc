@@ -8,9 +8,8 @@
 
     find-git-exclude-patterns-list
     '(
-      "~/\.\.*"
+      "/\\..*"
       "/rc/site-lisp\\."
-      "/\\.mozilla"
       )
 
     find-git-exclude-pathes-list
@@ -23,6 +22,7 @@
       "~/work/codereading"
       "~/share/emacs"
       "~/local"
+      "~/public_html"
       )
 
     find-git-include-pathes-list

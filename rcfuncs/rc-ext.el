@@ -164,7 +164,7 @@
          (preload  (or (plist-get args :preload )
                        (lambda ())))
 
-         (body    `(let ((rc-ext-current-class ,class))
+         (body    `(let ((rc-ext-current-class ',class))
                      (rc-ext-internal
                       ,path
                       ,(if (symbolp load)

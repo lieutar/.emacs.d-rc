@@ -9,3 +9,5 @@
             (defalias 'my-git-status 'magit-status))
  )
 
+;;(magit-status)
+
