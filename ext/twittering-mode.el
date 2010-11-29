@@ -15,6 +15,21 @@
    '(("F" twittering-favorite)
      ("R" twittering-retweet))))
    (add-hook 'twittering-mode-hook 'my-twittering-mode-hook)
+
+   (setq twittering-auth-method 'xauth)
+   (setq twittering-username (acman-get-username "twitter.com"))
+   (setq twittering-password (acman-get-property "twitter.com"
+                                                 twittering-username
+                                                 "password"))
+
+
+   (rc-emacsen-case
+    (meadow-nt-22
+     (setq twittering-connection-type-order
+           '(
+             ;;curl
+             wget
+             native
+             ))
+     ))
    ))
-
-

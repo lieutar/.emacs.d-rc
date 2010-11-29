@@ -2,5 +2,7 @@
       '(
         (window-manager . elscreen)
         (git . magit)
+        ;;(edit-json . json-ecmascript-mode)
+        (edit-json . json-javascript-mode)
         )
       )

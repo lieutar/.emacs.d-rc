@@ -1,3 +1,5 @@
+;;; ntemacs で、なんか引数なしの kill-buffer が使えなかったので
+
 (unless (fboundp 'kill-buffer-ntemacs-original)
   (fset 'kill-buffer-ntemacs-original (symbol-function 'kill-buffer)))
 

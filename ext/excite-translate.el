@@ -1,4 +1,4 @@
 (rc-ext
  :name 'excite-translate
- :autoload '(excite-translate-region)
+ :autoload '(excite-translate)
 )

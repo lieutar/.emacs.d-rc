@@ -21,5 +21,10 @@
 
  :init
  (lambda ()
+   (let ((mail (acman-get-property "*about*" "*me*" "email")))
+     (setq g-user-email        mail)
+     (setq gcal-user-email     mail)
+     (setq gblogger-user-email mail)
+     )
    ))
 
