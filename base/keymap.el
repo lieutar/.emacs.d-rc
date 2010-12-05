@@ -44,6 +44,7 @@
   (define-key km [?r ?c]    'org-remember-code-reading)
   (define-key km [?r ?t]    'org-remember-code-to-do)
   ;; s
+  (define-key km [?s]       'sr-speedbar-toggle)
   ;; t
   ;; timan
   (define-key km [?t ?K]    'timan-kitchen-timer)
