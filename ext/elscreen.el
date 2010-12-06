@@ -1,6 +1,13 @@
 (rc-ext
  :class 'window-manager
  :name  'elscreen
+
+ :load
+ (lambda ()
+   (require 'elscreen)
+   )
+
+
  :preload
  (lambda ()
    (setq elscreen-prefix-key (kbd "C-t"))

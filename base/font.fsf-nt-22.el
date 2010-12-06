@@ -52,8 +52,3 @@
   '((font   . "-*-*-normal-r-normal-normal-11-*-*-*-*-*-fontset-msgothic")
     (height . 82))
   default-frame-alist))
-
-
-
-
-

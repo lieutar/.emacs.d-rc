@@ -17,6 +17,14 @@
    (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
    (define-key global-map "\C-cl" 'org-store-link)
    (define-key global-map "\C-ca" 'org-agenda)
+   (setq org-directory "~/memo/")
+   (global-set-key
+     (kbd "C-z a") (lambda ()
+                     (interactive)
+                     (find-file (expand-file-name
+                                 "agenda.org"
+                                 org-directory))))
+
    )
 
  :get
@@ -33,9 +41,6 @@
 
 
    (setq org-log-done t)
-
-
-   (setq org-directory "~/memo/")
 
    (org-remember-insinuate)
 
@@ -93,8 +98,6 @@
              `(("CodeReading" ?r "** %(identity prefix)%?\n   \n   %a\n   %t"
                 ,org-code-reading-file "Memo"))))
        (org-remember)))
-
-   
    
    (define-key org-mode-map (kbd "C-c <up>")    'org-shiftup)
    (define-key org-mode-map (kbd "C-c <down>")  'org-shiftdown)
