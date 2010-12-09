@@ -88,7 +88,8 @@
   ;; Z
 
   (define-key km [?\C-c] 'save-buffers-kill-emacs)
-  (define-key km [?\C-f] 'my-find-lib)
+  (define-key km [?\C-f] 'anything-open-files)
+  (define-key km [?\M-f] 'my-find-lib)
   (define-key km [?\C-t] 'excite-translate)
 
   (define-key km [?\M-g] 'my-git-status)

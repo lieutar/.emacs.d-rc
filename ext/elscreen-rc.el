@@ -1,12 +1,10 @@
 (rc-ext
+
  :class 'window-manager
+
  :name  'elscreen
 
- :load
- (lambda ()
-   (require 'elscreen)
-   )
-
+ :load 'elscreen
 
  :preload
  (lambda ()
@@ -44,6 +42,14 @@
 
    (add-hook 'elscreen-screen-update-hook 'elscreen-frame-title-update)
 
+   (when (locate-library "anything-config")
+
+     (defun my-rc-anything-elscreen ()
+       (interactive)
+       (anything 'anything-c-source-elscreen)
+       nil nil nil nil "*elscreen*")
+
+     (define-key elscreen-map (kbd"C-t") 'my-rc-anything-elscreen))
 
 
    ))
