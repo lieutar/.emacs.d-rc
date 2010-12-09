@@ -5,6 +5,8 @@
  (lambda ()
    (setq
 
+    find-git-auto-status-mode t
+
     find-git-exclude-patterns-list
     '(
       "/\\.[^/]+\\'"
