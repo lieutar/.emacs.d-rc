@@ -77,6 +77,7 @@
   ;; P
   ;; Q
   ;; R
+  (define-key km [?R] 'find-git-find-repos)
   ;; S
   ;; T
   ;; U

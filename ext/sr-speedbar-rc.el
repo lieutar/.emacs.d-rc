@@ -9,7 +9,7 @@
    )
  :init
  (lambda ()
-   (setq sr-speedbar-width-x 31)
+   (setq sr-speedbar-width-x 37)
    (setq sr-speedbar-right-side nil)
    (setq sr-speedbar-skip-other-window-p t)
    (setq sr-speedbar-buffer-name " SPEEDBAR")
