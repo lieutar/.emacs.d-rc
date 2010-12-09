@@ -10,5 +10,15 @@
  :init
  (lambda ()
    (define-derived-mode json-mode javascript-mode "json")
+
+   ;; TODO json.el のデータを使って、正規表現テーブルを作ってみるとか
+   (defconst json-mode-lex-regexps
+     '((json-read-string "\"\\(\\(\\)\\)\"" 1
+                         (lambda ()
+                           ))
+       (json-read-object ".")
+       ()))
+
    )
 )
+

@@ -3,6 +3,7 @@
 
 "
 ;; dired
+(require 'dired)
 (rc-vise-km dired-mode-map)
 
 ;; wdired

@@ -19,13 +19,36 @@
       (cond
        ((<= 166 width)
 
+        (defconst my-elscreen-initialized-flags (make-hash-table :test 'eq))
+
+        (defun my-elscreen-after-goto ()
+          (unless (gethash screen my-elscreen-initialized-flags)
+
+            ;;(sr-speedbar-open)
+            ;;(other-window 1)
+            (split-window-vertically (- (frame-parameter (selected-frame)
+                                                         'height)
+                                        10))
+            (other-window 1)
+            (switch-to-buffer "*scratch*")
+            (other-window 1)
+            (split-window-horizontally)
+
+            (puthash screen t my-elscreen-initialized-flags)
+            ))
+        (add-hook 'elscreen-goto-hook 'my-elscreen-after-goto)
+
+        (defun my-elscreen-after-kill ()
+          (puthash screen nil my-elscreen-initialized-flags))
+        (add-hook 'elscreen-kill-hook 'my-elscreen-after-kill)
+        ;;elscreen-kill-hook
+
+        (let ((screen 0)) (my-elscreen-after-goto))
         (twit)
-        (split-window-horizontally)
         (other-window 1)
         (twittering-visit-timeline ":mentions")
 
         (elscreen-create)
-        (split-window-horizontally)
         (when (file-readable-p "~/memo/agenda.org")
           (find-file  "~/memo/agenda.org")
           (and (re-search-forward "^\\*\\* Log" nil t)
@@ -52,16 +75,13 @@
         (other-window 1)
           
         (elscreen-create)
-        (split-window-horizontally)
-
-        (elscreen-create)
-        (split-window-horizontally)
           
         (elscreen-next)
         (elscreen-next)
         )
    
        ((<= 90 width)
+        (twit)
         (elscreen-create)
         (split-window-horizontally 85)
         (elscreen-create)
