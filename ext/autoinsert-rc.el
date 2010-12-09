@@ -6,7 +6,7 @@
    (auto-insert-mode)  ;;; Adds hook to find-files-hook
    ;; Or use custom, *NOTE* Trailing slash important
    ;; !!!needs last slash!!!
-   (setq auto-insert-directory "~/.emacs.d/templates/")
+   (setq auto-insert-directory "~/.emacs.d/templates/outline")
     ;; If you don't want to be prompted before insertion
    (setq auto-insert-query 'function)
 
@@ -52,7 +52,3 @@
      auto-insert-alist))
 
    ))
-
-
-
-
