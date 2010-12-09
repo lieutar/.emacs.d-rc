@@ -21,6 +21,11 @@
 
         (defconst my-elscreen-initialized-flags (make-hash-table :test 'eq))
 
+        (defconst my-elscreen-background-color-list
+          '(("#554433" . "#F8F8F0")
+            ("#335566" . "#F0FCFC")
+            ("#000000" . "#FFFFFF")))
+
         (defun my-elscreen-after-goto ()
           (unless (gethash screen my-elscreen-initialized-flags)
 
@@ -35,7 +40,16 @@
             (split-window-horizontally)
 
             (puthash screen t my-elscreen-initialized-flags)
-            ))
+            )
+          (modify-frame-parameters
+           (selected-frame)
+           (let ((color (nth (min
+                              (1- (length  my-elscreen-background-color-list))
+                              screen)
+                             my-elscreen-background-color-list)))
+             `((foreground-color . ,(car color))
+               (background-color . ,(cdr color))))))
+
         (add-hook 'elscreen-goto-hook 'my-elscreen-after-goto)
 
         (defun my-elscreen-after-kill ()
