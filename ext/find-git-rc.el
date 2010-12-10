@@ -5,7 +5,7 @@
  (lambda ()
    (setq
 
-    find-git-auto-status-mode t
+    find-git-auto-status-mode nil
 
     find-git-exclude-patterns-list
     '(
