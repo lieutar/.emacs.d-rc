@@ -57,6 +57,7 @@
   ;; x
   ;; y
   ;; z
+  (define-key km [?z]       'global-framov-mode)
 
   ;; A
   ;; B

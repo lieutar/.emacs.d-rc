@@ -1,26 +1,8 @@
-(require 'framov)
-(setq framov-x-screen-margin '(-8 0 48 -8))
-(global-set-key [?\C-z ?z] 'global-framov-mode)
+(rc-ext
+ :name  'framov
+ :get   "https://github.com/lieutar/framov.el/raw/master/framov.el"
+ :autoload '(global-framov-mode)
+ :init
+ (lambda ()
+   (setq framov-x-screen-margin '(-8 0 48 -8))))
 
-;(setq framov-x-screen-margin '(-2 -1024 48 -4))
-
-;; (defun my-other-window (count)
-;;   (interactive "p")
-;;   (let ((win (selected-window)))
-;;     (while (> count 0)
-;;       (setq win (next-window win nil t))
-;;       (setq count (1- count)))
-;;     (raise-frame (select-frame (window-frame win)))
-;;     (select-window win)))
-
-;; (defun my-previous-window (count)
-;;   (interactive "p")
-;;   (let ((win (selected-window)))
-;;     (while (> count 0)
-;;       (setq win (previous-window win nil t))
-;;       (setq count (1- count)))
-;;     (raise-frame (select-frame (window-frame win)))
-;;     (select-window win)))
-
-;;(global-set-key [?\C-x ?o] 'my-other-window)
-;;(global-set-key [?\C-z ?o] 'my-previous-window)
