@@ -1,5 +1,6 @@
 (rc-ext
  :name 'estimate
+ :load 'estimate-mode
  :autoload '(estimate-mode)
 
  :preload
@@ -9,5 +10,5 @@
 
  :init
  (lambda ()
-   (setq estimate-source-json "~/.estimate.json")))
+   (setq estimate-source-jsons '("~/work/job/core/estimate/items.json"))))
 

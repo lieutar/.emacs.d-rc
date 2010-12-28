@@ -4,105 +4,13 @@
 (defconst setup-my-working-environment-confirm-timer  nil)
 
 (defun setup-my-working-environment ()
+  (if (> (x-display-pixel-width) 800)
+      (progn
+        (modify-frame-parameters (selected-frame) '((width  . 166)))
+        (my-rc-wide-screen-envronment))
+    (progn
+      (my-rc-narrow-screen-environment))))
 
-  (rc-emacsen-case
-   (@-nt-@
-    ;;(modify-frame-parameters (selected-frame) '((width  . 203)))
-    (modify-frame-parameters (selected-frame) '((width  . 166)))
-    ;;(assoc 'width (frame-parameters (selected-frame)))
-    ;;(assoc 'height (frame-parameters (selected-frame)))
-    ))
-
-  (when (fboundp 'elscreen-create)
-    (let ((width (cdr (assq 'width
-                            (frame-parameters (selected-frame))))))
-      (cond
-       ((<= 166 width)
-
-        (defconst my-elscreen-initialized-flags (make-hash-table :test 'eq))
-
-        (defconst my-elscreen-background-color-list
-          '(("#554433" . "#F8F8F0")
-            ("#335566" . "#F0FCFC")
-            ("#000000" . "#FFFFFF")))
-
-        (defun my-elscreen-after-goto ()
-          (unless (gethash screen my-elscreen-initialized-flags)
-
-            ;;(sr-speedbar-open)
-            ;;(other-window 1)
-            (split-window-vertically (- (frame-parameter (selected-frame)
-                                                         'height)
-                                        10))
-            (other-window 1)
-            (switch-to-buffer "*scratch*")
-            (other-window 1)
-            (split-window-horizontally)
-
-            (puthash screen t my-elscreen-initialized-flags)
-            )
-          (modify-frame-parameters
-           (selected-frame)
-           (let ((color (nth (min
-                              (1- (length  my-elscreen-background-color-list))
-                              screen)
-                             my-elscreen-background-color-list)))
-             `((foreground-color . ,(car color))
-               (background-color . ,(cdr color))))))
-
-        (add-hook 'elscreen-goto-hook 'my-elscreen-after-goto)
-
-        (defun my-elscreen-after-kill ()
-          (puthash screen nil my-elscreen-initialized-flags))
-        (add-hook 'elscreen-kill-hook 'my-elscreen-after-kill)
-        ;;elscreen-kill-hook
-
-        (let ((screen 0)) (my-elscreen-after-goto))
-        (twit)
-        (other-window 1)
-        (twittering-visit-timeline ":mentions")
-
-        (elscreen-create)
-        (when (file-readable-p "~/memo/agenda.org")
-          (find-file  "~/memo/agenda.org")
-          (and (re-search-forward "^\\*\\* Log" nil t)
-               (progn
-                 (beginning-of-line)
-                 (condition-case nil
-                     (progn
-                       (call-interactively 'org-cycle)
-                       t)
-                   (error)))
-               (re-search-forward "^\\*\\* Active" nil t)
-               ))
-        (other-window 1)
-        (display-about-screen)
-        (split-window-vertically 22)
-        (when (fboundp 'find-git)
-          (setq find-git-popup-find-git-mode-buffer t)
-          (setq find-git-mode-reflesh nil)
-          (let ((find-git-popup-find-git-mode-buffer nil)
-                (find-git-mode-reflesh t))
-            (find-git "~" :popup-to-current-window t)
-            ))
-        (other-window 1)
-        (other-window 1)
-          
-        (elscreen-create)
-          
-        (elscreen-next)
-        (elscreen-next)
-        )
-   
-       ((<= 90 width)
-        (twit)
-        (elscreen-create)
-        (split-window-horizontally 85)
-        (elscreen-create)
-        (split-window-horizontally 85)
-        (elscreen-create)
-        (split-window-horizontally 85)
-        (elscreen-next))))))
 
 (defconst setup-my-working-environment-confirm-mode-map
   (let ((km (make-sparse-keymap)))
