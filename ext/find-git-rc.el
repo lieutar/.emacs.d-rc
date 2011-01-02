@@ -17,6 +17,8 @@
     find-git-exclude-pathes-list
     '(
       "~/smb"
+      "~/lapwork"
+      "~/winhome"
       "~/sandbox"
       "~/Desktop"
       "~/work/build"

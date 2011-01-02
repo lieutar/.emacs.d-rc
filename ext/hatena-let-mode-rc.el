@@ -1,17 +1,30 @@
 (rc-ext
  :name 'hatena-let-mode
  :load 'hatena-let
+ :requires '(
+             js2
+             )
  :get "https://gist.github.com/raw/662175/80dafc5664e1085ba223357ae63dd65314f387bd/hatena-let.el"
- :autoload 'hatena-let/edit
+ :autoload '(
+             hatena-let/edit
+             hatena-let-mode
+             )
  :init
  (lambda ()
 
-   (setq hatena-let/apikey "bb45d27de635f66967752a548687e72527ea50fc ")
+   (setq hatena-let/apikey
+         (acman-get "hatena.ne.jp lieutar Hatena::Let/api-key"))
 
    (defconst hatena-let-mode-map
      (let ((km (make-sparse-keymap)))
-       (define-key km (kbd "C-x C-s") 'hatena-let/save-code)
+       (define-key km (kbd "C-x C-s") 'hatena-let-mode/save-code)
        km))
+
+   (defun hatena-let-mode/save-code ()
+     (interactive)
+     (save-buffer)
+     (hatena-let/save-code)
+     (hatena-let-mode))
 
    (define-derived-mode hatena-let-mode js2-mode "hatena-let" ""
      )
