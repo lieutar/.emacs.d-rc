@@ -1,5 +1,6 @@
 
 (rc-ext
+ :name 'auto-install
  :load  'auto-install
  :get  "http://www.emacswiki.org/emacs/download/auto-install.el"
  :autoload 'auto-install-batch

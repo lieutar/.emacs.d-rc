@@ -1,4 +1,5 @@
 (rc-ext
+ :name     'package
  :autoload 'package-install
 
  :load 

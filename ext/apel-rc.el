@@ -1,4 +1,5 @@
 (rc-ext
+ :name 'apel
  :load
  (lambda ()
    (require 'poe)

@@ -1,5 +1,6 @@
 (rc-ext
  :name  'anything
+ :requires '(auto-install)
  :load  (lambda () (load-library "anything-config"))
  :get   (lambda () (auto-install-batch "anything"))
  :init
@@ -16,8 +17,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (rc-ext
- :requires '(anything
-             find-git)
+ :name     'my-anything-open
+ :load      nil
+ :requires '(
+             anything
+             find-git
+             )
  :autoload 'my-anything-open
  :init
  (lambda ()
@@ -74,5 +79,3 @@
        )
       :buffer "*open-files*"))
    ))
-
-

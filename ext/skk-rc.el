@@ -1,6 +1,8 @@
 (rc-ext
+ :name 'skk
  :load 'skk
  :autoload '(skk-mode)
+ :requires '(apel)
 
  :get 
  (lambda ()

@@ -2,9 +2,11 @@
  :name 'hatena-let-mode
  :load 'hatena-let
  :requires '(
+             deferred
              js2
              )
- :get "https://gist.github.com/raw/662175/80dafc5664e1085ba223357ae63dd65314f387bd/hatena-let.el"
+ :get (concat "https://gist.github.com/raw/"
+              "662175/80dafc5664e1085ba223357ae63dd65314f387bd/hatena-let.el")
  :autoload '(
              hatena-let/edit
              hatena-let-mode
@@ -55,4 +57,6 @@
          );; end of deferred:$
        );; end of let
      );; end of defun
+
    ))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

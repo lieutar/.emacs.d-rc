@@ -1,3 +1,0 @@
-(rc-ext
- :name 'acman
- )
