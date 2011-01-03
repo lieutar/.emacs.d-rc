@@ -39,7 +39,7 @@
    (setq org-startup-truncated nil)
    (setq org-return-follows-link t)
 
-
+   (setq org-hide-leading-stars t)
    (setq org-log-done t)
 
    (org-remember-insinuate)
