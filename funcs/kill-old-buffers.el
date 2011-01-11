@@ -16,16 +16,12 @@
 ;;       (and (= (car a)(car b))
 ;;            (> (cadr a)(cadr b)))))
 
-
 (defun kill-old-buffers:buffer-value (buffer sym)
   (let (r)
     (save-excursion
       (set-buffer buffer)
       (setq r (symbol-value sym)))
     r))
-
-
-
 
 (defun kill-old-buffers ()
   (interactive)

@@ -4,6 +4,7 @@
 "
 ;; dired
 (require 'dired)
+(rc-load "rc-vise-km")
 (rc-vise-km dired-mode-map)
 
 ;; wdired
@@ -15,6 +16,7 @@
  (lambda ()
    (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
    )
+
  :init
  (lambda ()
 

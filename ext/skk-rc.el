@@ -1,6 +1,8 @@
 (rc-ext
+ :name 'skk
  :load 'skk
  :autoload '(skk-mode)
+ :requires '(apel)
 
  :get 
  (lambda ()
@@ -13,6 +15,15 @@
 
  :init
  (lambda ()
+
+   (setq skk-date-ad t)
+
+   (setq skk-large-jisyo 
+         (rc-emacsen-case
+          (@-nt-@
+           "c:/cygwin/usr/local/share/skk/SKK-JISYO.L")
+          (t
+           "/usr/local/share/skk/SKK-JISYO.L")))
 
    (defconst my-skk-weekday-name-list
      (split-string "Mon Tue Wed Thu Fri Sat Sun" " "))

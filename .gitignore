@@ -4,3 +4,4 @@
 site-lisp*
 sync.sexp
 *.stackdump
+/farm/subdirs.el

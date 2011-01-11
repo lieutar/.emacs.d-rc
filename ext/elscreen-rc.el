@@ -1,10 +1,7 @@
 (rc-ext
-
  :class 'window-manager
-
  :name  'elscreen
-
- :load 'elscreen
+ :load  'elscreen
 
  :preload
  (lambda ()
@@ -38,7 +35,7 @@
                       )))
          (if (fboundp 'set-frame-name)
              (set-frame-name title)
-           (setq frame-title-format title)))))
+        (setq frame-title-format title)))))
 
    (add-hook 'elscreen-screen-update-hook 'elscreen-frame-title-update)
 
@@ -52,4 +49,21 @@
      (define-key elscreen-map (kbd"C-t") 'my-rc-anything-elscreen))
 
 
+   (define-key elscreen-map (kbd "C-c") 'elsp:create)
+
+   (defun my-rc-3cols-environment ()
+     (require 'elsp)
+     (rc-load "myenv-elscreen-3cols")
+     (elsp:after-goto))
+
+   (defun my-rc-wide-screen-environment ()
+     (require 'elsp)
+     (rc-load "myenv-elscreen-wide")
+     (elsp:after-goto))
+
+   (defun my-rc-narrow-screen-environment ()
+     (require 'elsp)
+     (rc-load "myenv-elscreen-narrow")
+     (elsp:after-goto))
    ))
+

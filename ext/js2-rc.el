@@ -1,4 +1,5 @@
 (rc-ext
+ :name 'js2
  :load (lambda () (load "js2-20090723b"))
  :get  "http://js2-mode.googlecode.com/files/js2-20090723b.el"
  :preload (lambda ()

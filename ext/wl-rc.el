@@ -3,7 +3,8 @@
  :load (lambda ()
          (require 'wl)
          (require 'starttls)
-         (require 'ssl))
+         (require 'ssl)
+         )
 
  :get  (lambda ()
          (browse-url "http://www.gohome.org/wl/index.ja.html"))
@@ -14,6 +15,7 @@
    (setq ssl-certificate-verification-policy 1) 
    (setq ssl-program-name "openssl")
    (setq starttls-negotiation-by-kill-program t)
-   (setq starttls-kill-program "c:/cygwin/bin/kill")
+   (rc-emacsen-case
+    (@-nt-@
+     (setq starttls-kill-program "c:/cygwin/bin/kill")))
    ))
-
