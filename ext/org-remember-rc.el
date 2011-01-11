@@ -103,6 +103,9 @@
    (define-key org-mode-map (kbd "C-c <down>")  'org-shiftdown)
    (define-key org-mode-map (kbd "C-c <left>")  'org-shiftleft)
    (define-key org-mode-map (kbd "C-c <right>") 'org-shifright)
+
+   (define-key org-mode-map (kbd "C-z <right>") 'org-demote-subtree)
+   (define-key org-mode-map (kbd "C-z <left>")  'org-promote-subtree)
    
    (define-key org-mode-map (kbd "S-<up>") nil)
    (define-key org-mode-map (kbd "S-<down>") nil)
