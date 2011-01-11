@@ -28,8 +28,3 @@
     (insert c)))
 
 (global-set-key (kbd "SPC") 'multident-or-self-insert-command)  
-
-
-
-
-

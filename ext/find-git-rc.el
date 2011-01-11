@@ -23,6 +23,7 @@
       "~/Desktop"
       "~/work/build"
       "~/work/pending"
+      "~/work/sandbox"
       "~/work/codereading"
       "~/share/emacs"
       "~/local"

@@ -2,7 +2,10 @@
  :name 'cygstart
  :load 'cygstart
  :autoload '(cygstart
-             dired-cygstart)
+             dired-cygstart
+             cygstart-explore
+             dired-cygstart-explore
+             dired-mouse-cygstart)
  :preload 
  (lambda ()
    (require 'dired)
@@ -13,14 +16,18 @@
    (define-key dired-mode-map [mouse-2] 'dired-mouse-cygstart)
    ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (rc-ext
  :name 'anything-quicklaunch-cygstart
+ :load nil
  :requires '(cygstart
              anything)
  :autoload '(anything-quicklaunch-cygstart
              anything-quicklaunch)
  :init
  (lambda ()
+
    (defvar anything-quicklaunch-cygstart-path
      (concat "/cygdrive/c/Users/"
              user-login-name
@@ -51,3 +58,17 @@
    (defalias 'anything-quicklaunch 'anything-quicklaunch-cygstart)
    ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(rc-ext
+ :name 'cygstart:anything-add-type
+ :load nil
+ :requires '(anything)
+ :init
+ (lambda ()
+   (let ((action-slot (assoc
+                       'action (cdr (assoc 'file anything-type-attributes)))))
+     (setcdr action-slot
+             (append (cdr action-slot)
+                     '(("Cygstart" . cygstart)
+                       ("Cygstart Explorer" . cygstart-explore)))))))

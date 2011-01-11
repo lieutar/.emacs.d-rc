@@ -9,7 +9,17 @@
    (global-unset-key (kbd "C-x C-f"))
    (global-set-key   (kbd "C-x C-f") 'find-file)
    (global-set-key   (kbd "M-x")     'anything-M-x)
-   (global-set-key   (kbd "C-x b")   'anything-buffers+)
+   ;;(global-set-key   (kbd "C-x b")   'switch-to-buffer)
+
+   (defvar anything-c-source-info-elisp
+     '((name . "Info index: elisp")
+       (info-index . "elisp")))
+
+   (defun anything-elisp-info ()
+     (interactive)
+     (anything 'anything-c-source-info-elisp))
+   (define-key emacs-lisp-mode-map
+     (kbd "C-c C-a i") 'anything-elisp-info)
 
    )
  )
@@ -28,34 +38,47 @@
  (lambda ()
 
 
-   (when nil
 
-   (defconst anything-c-elisp-library-scan2:libs nil)
-   (defconst anything-c-source-elisp-library-scan2
-     (copy-alist anything-c-source-elisp-library-scan))
+   (defconst my-anything-rc-dirs '("lisp"
+                                   "ext"
+                                   "funcs"
+                                   "last"))
 
-   (setcdr (assq 'init anything-c-source-elisp-library-scan2)
-           'anything-c-elisp-library-scan2-init)
+   (defconst anything-c-source-rc-dirs
+     '((name . "RC directories")
+       (candidates
+        . (lambda ()
+            (mapcar (lambda (dir) (expand-file-name
+                                   dir rc-directory)) my-anything-rc-dirs)))
+       (action
+        . (("Dired" . dired)
+           ("New"   . (lambda (dir)
+                        (let ((default-directory dir))
+                          (call-interactively 'find-file))))))))
 
-   (defun anything-c-elisp-library-scan2-init
-     (when anything-c-elisp-library-scan2:libs
-       (insert anything-c-elisp-library-scan2:libs)))
-
-   (defadvice anything-c-elisp-library-scan-init (around
-                                                  my-rc
-                                                  activate)
-     (with-temp-buffer
-       (let ((anything-buffer (current-buffer)))
-         ad-do-it
-         (setq anything-c-elisp-library-scan2:libs
-               (buffer-substring (point-min) (point-max)))))
-     (with-current-buffer anything-buffer
-       (insert anything-c-elisp-library-scan2:libs)))
-
-   (ad-deactivate  'anything-c-elisp-library-scan-init)
-
-   )
-
+   (defconst anything-c-source-rc-files
+     '((name . "RC files")
+       (candidates
+        . (lambda ()
+            (apply
+             'append
+             (mapcar 
+              (lambda (dir)
+                (apply 'append
+                       (mapcar 
+                        (lambda (file)
+                          (when (string-match "\\.el\\'" file)
+                            (list
+                             (cons
+                              (format "rc/%s/%s" dir file)
+                              (expand-file-name
+                               file
+                               (expand-file-name dir rc-directory))))))
+                        (directory-files
+                         (expand-file-name dir rc-directory)))))
+              my-anything-rc-dirs))
+            ))
+       (type . file)))
 
    (defun my-anything-open ()
      (interactive)
@@ -67,6 +90,8 @@
          anything-c-source-recentf
 
          ,@find-git-anything-c-sources
+         anything-c-source-rc-dirs
+         anything-c-source-rc-files
 
          anything-c-source-file-cache
          anything-c-source-files-in-current-dir
