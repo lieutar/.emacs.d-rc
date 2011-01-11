@@ -48,8 +48,10 @@
      '((name . "RC directories")
        (candidates
         . (lambda ()
-            (mapcar (lambda (dir) (expand-file-name
-                                   dir rc-directory)) my-anything-rc-dirs)))
+            (append
+             (mapcar (lambda (dir)
+                       (expand-file-name dir rc-directory))
+                     my-anything-rc-dirs))))
        (action
         . (("Dired" . dired)
            ("New"   . (lambda (dir)
@@ -76,7 +78,17 @@
                                (expand-file-name dir rc-directory))))))
                         (directory-files
                          (expand-file-name dir rc-directory)))))
-              my-anything-rc-dirs))
+              (append
+               (let ((farmdir (expand-file-name "farm"  rc-directory)))
+                 (apply 'append
+                        (mapcar
+                         (lambda (dir)
+                           (let ((full (expand-file-name dir farmdir)))
+                             (when (and (string-match "[^.]" dir)
+                                        (file-directory-p full))
+                               (list (format "farm/%s" dir)))))
+                         (directory-files farmdir))))
+               my-anything-rc-dirs)))
             ))
        (type . file)))
 

@@ -156,26 +156,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defmethod biztask:graph:rearrange-nodes ((graph biztask:graph))
-  (dolist (task (biztask:graph-edges graph))
-    (let ((from (biztask:task-start-node task))
-          (to   (biztask:task-end-node   task)))
-      (when (eq from to)
-        (let ((new-to (biztask:graph-allocate-node graph)))
-          (dolist (out (biztask:node-out from))
-            (if (eq to (biztask:task-end-node out))
-                (biztask:task-set-end-node out new-to)
-              (biztask:task-set-start-node out new-to))))))))
-
-
-(defmethod biztask:task-to-graph ((self biztask:task))
-  (let* ((graph (biztask:graph:new (biztask:task-name self))))
-    (dolist (dep (biztask:task-depends self))
-      (biztask:graph-add-task graph dep (biztask:graph-end graph)))
-    (biztask:graph:rearrange-nodes graph)
-    graph))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defclass biztask:node ()
   ((id
@@ -242,6 +222,27 @@
     :initform ()
     :reader   biztask:graph-edges))
   :documentation "")
+
+
+(defmethod biztask:graph:rearrange-nodes ((graph biztask:graph))
+  (dolist (task (biztask:graph-edges graph))
+    (let ((from (biztask:task-start-node task))
+          (to   (biztask:task-end-node   task)))
+      (when (eq from to)
+        (let ((new-to (biztask:graph-allocate-node graph)))
+          (dolist (out (biztask:node-out from))
+            (if (eq to (biztask:task-end-node out))
+                (biztask:task-set-end-node out new-to)
+              (biztask:task-set-start-node out new-to))))))))
+
+
+(defmethod biztask:task-to-graph ((self biztask:task))
+  (let* ((graph (biztask:graph:new (biztask:task-name self))))
+    (dolist (dep (biztask:task-depends self))
+      (biztask:graph-add-task graph dep (biztask:graph-end graph)))
+    (biztask:graph:rearrange-nodes graph)
+    graph))
+
 
 (defun biztask:graph:new (name)
   (let ((start (biztask:node:new :id 'start :symbol 'start))
@@ -400,7 +401,7 @@
 
 
 (defmethod biztask:graph-to-dot ((self biztask:graph) &rest opts)
-  (biztask:graph-set-node-symbols graph)
+  (biztask:graph-set-node-symbols self)
 
   (format
    "
@@ -507,7 +508,7 @@ digraph \"%s\" {
                  (biztask1 )))
 
          ((eq 'sequence car)
-          (let ((spec (reverse (cdr spec)))
+          (let ((spec (cdr spec))
                 (last nil))
             (while spec
               (let ((car (biztask1 (car spec) dic)))
@@ -545,6 +546,14 @@ digraph \"%s\" {
       (pop-to-buffer buf))))
 
 
+(defmethod biztask:graph:save-dot ((self biztask:graph) file &rest opts)
+  (with-temp-buffer
+    (insert (apply 'biztask:graph-to-dot self opts))
+    (setq buffer-file-name file)
+    (save-buffer))
+  file)
+
+
 (defun biztask:graph:preview:sentinel  (dotf svgf args)
   (when args
     (let* ((proc (car args))
@@ -572,19 +581,16 @@ digraph \"%s\" {
                        (or (plist-get opts :layout) "dot")
                        svgf
                        dotf)))
-    (with-temp-buffer
-      (insert (apply 'biztask:graph-to-dot self opts))
-      (setq buffer-file-name dotf)
-      (save-buffer)
-;;;
-      (let* ((buf  (generate-new-buffer "*biztask compilation*"))
-             (proc (start-process-shell-command "*biztask compilation*"
-                                                buf
-                                                cmd)))
-        (set-process-sentinel
-         proc
-         `(lambda (&rest args) (biztask:graph:preview:sentinel 
-                                ,dotf ,svgf args)))))))
+    (apply 'biztask:graph:save-dot self dotf opts)
+
+    (let* ((buf  (generate-new-buffer "*biztask compilation*"))
+           (proc (start-process-shell-command "*biztask compilation*"
+                                              buf
+                                              cmd)))
+      (set-process-sentinel
+       proc
+       `(lambda (&rest args) (biztask:graph:preview:sentinel 
+                              ,dotf ,svgf args))))))
 
 
 
