@@ -1,11 +1,10 @@
 
-
 (defsubst soloar:sind (d) (sin (pi * d / 180)))
 (defsubst soloar:cosd (d) (cos (pi * d / 180)))
 (defsubst soloar:tand (d) (tan (pi * d / 180)))
 
 ;; calculate Julius year (year from 2000/1/1, for variable "t")
-(defsubst soloar:jd   (yy mm dd h m s i)
+(defsubst soloar:jy   (yy mm dd h m s i)
   (setq yy (mod yy 100))
   (when (<= mm 2)
     (setq mm (+ 12 mm))
@@ -170,60 +169,83 @@
 
 
 
-function calc(f) { // main routine
- yy = eval(f.year.value) ;
- mm = eval(f.month.value) ;
- dd = eval(f.dayn.value) ;
- i = eval(f.def.value) ;
- la = eval(f.lat.value) ;//緯度
- lo = eval(f.lon.value) ;//経度
- alt = eval(f.alt.value) ;//標高
- ans = yy + "年" + mm + "月" + dd + "日の計算結果\n" ;
+(defun solar:calc (&rest f)
+  (let ((yy  (plist-get f :year))
+        (mm  (plist-get f :month))
+        (dd  (plist-get f :dayn))
+        (i   (plist-get f :def))
+        (la  (plist-get f :lat))
+        (lo  (plist-get f :lon))
+        (alt (plist-get f :alt))
+        (ans nil)
+        astronomical-twilight-1
+        naval-twilight-1
+        civil-twilight-1
+        sunrize
+        noon
+        sunset
+        civil-twilight-2
+        naval-twilight-2
+        astronomical-twilight-2
+        sunrize-direction
+        sunset-direction
+        noon-height)
 
- t = jy(yy,mm,dd-1,23,59,0,i) ;
- th = sh(t,23,59,0,lo,i) ;
- ds = spds(t) ;
- ls = spls(t) ;
- alp = spal(t) ;
- dlt = spdl(t) ;
- pht = soal(la,th,alp,dlt) ;
- pdr = sodr(la,th,alp,dlt) ;
+    (let* ((t  (solar:jy yy mm (1- dd) 23 59 0 i))
+           (th (solar:sh t 23 59 0 lo i))
+           (ds (solar:spds t))
+           (ls (solar:spls t))
+           (alp (solar:spal t))
+           (dlt (solar:spdl t))
+           (pht (solar:soal la th alp dlt))
+           (pdr (solar:sodr la th alp dlt)))
 
- for(hh=0; hh<24; hh++) {
-  for(m=0; m<60; m++) {
-   t = jy(yy,mm,dd,hh,m,0,i) ;
-   th = sh(t,hh,m,0,lo,i) ;
-   ds = spds(t) ;
-   ls = spls(t) ;
-   alp = spal(t) ;
-   dlt = spdl(t) ;
-   ht = soal(la,th,alp,dlt) ;
-   dr = sodr(la,th,alp,dlt) ;
-   tt = eandp(alt,ds) ;
-   t1 = tt - 18 ;
-   t2 = tt - 12 ;
-   t3 = tt - 6 ;
-   t4 = sa(alt,ds) ;
- // Solar check 
- // 0: non, 1: astronomical twilight start , 2: voyage twilight start,
- // 3: citizen twilight start, 4: sun rise, 5: meridian, 6: sun set,
- // 7: citizen twilight end, 8: voyage twilight end,
- // 9: astronomical twilight end
-   if((pht<t1)&&(ht>t1)) ans += hh + "時" + m + "分 天文薄明始まり\n" ;
-   if((pht<t2)&&(ht>t2)) ans += hh + "時" + m + "分 航海薄明始まり\n" ;
-   if((pht<t3)&&(ht>t3)) ans += hh + "時" + m + "分 市民薄明始まり\n" ;
-   if((pht<t4)&&(ht>t4)) ans += hh + "時" + m + "分 日出(方位" + Math.floor(dr) +"度)\n" ;
-   if((pdr<180)&&(dr>180)) ans += hh + "時" + m + "分 南中(高度" +Math.floor(ht)+"度)\n" ;
-   if((pht>t4)&&(ht<t4)) ans += hh + "時" + m + "分 日没(方位" + Math.floor(dr) +"度)\n" ;
-   if((pht>t3)&&(ht<t3)) ans += hh + "時" + m + "分 市民薄明終わり\n" ;
-   if((pht>t2)&&(ht<t2)) ans += hh + "時" + m + "分 航海薄明終わり\n" ;
-   if((pht>t1)&&(ht<t1)) ans += hh + "時" + m + "分 天文薄明終わり\n" ;
-   pht = ht ;
-   pdr = dr ;
-   }
-  }
- f.result.value = ans ;
- }
-
-
+      (loop for hh from 0 to 24 do
+            (loop for m from 0 to 60 do
+                  (let* ((t  (solar:jy  yy mm dd hh m 0 i))
+                         (th (solar:sh   t hh  m lo i))
+                         (ds (solar:spds t))
+                         (ls (solar:spls t))
+                         (alp (solar:spal t))
+                         (dlt (solar:spdl t))
+                         (ht (solar:soal la th alp dlt))
+                         (dr (solar:sodr la th alp dlt))
+                         (tt (solar:eandp alt ds))
+                         (t1 (- tt 18.0))
+                         (t2 (- tt 12.0))
+                         (t3 (- tt 6.0))
+                         (t4 (solar:sa alt ds))
+                         (sym (cond
+                               ((and (< pht t1)(> ht t1)) 'astronomical-twilight-1)
+                               ((and (< pht t2)(> ht t2)) 'naval-twilight-1)
+                               ((and (< pht t3)(> ht t3)) 'civil-twilight-1)
+                               ((and (< pht t4)(> ht t4))
+                                (setq sunrize-direction (floor dr))
+                                'sunrize)
+                               ((and (< pdr 180)(> dr 180))
+                                (setq noon-height (flor ht))
+                                'noon)
+                               ((and (> pht t4)(< ht t4))
+                                (setq sunset-direction (floor dr))
+                                'sunset)
+                               ((and (> pht t3)(< ht t3)) 'civil-twilight-2)
+                               ((and (> pht t2)(< ht t2)) 'naval-twilight-2)
+                               ((and (> pht t1)(< ht t1)) 'astronomical-twilight-2)
+                               )))
+                    (when sym (set sym (cons hh m)))
+                    (setq pht ht)
+                    (setq pdr dr)))))
+    (list
+     astronomical-twilight-1
+     naval-twilight-1
+     civil-twilight-1
+     sunrize
+     noon
+     sunset
+     civil-twilight-2
+     naval-twilight-2
+     astronomical-twilight-2
+     noon-height
+     sunrize-direction
+     sunset-direction)))
 
