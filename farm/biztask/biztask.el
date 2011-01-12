@@ -76,7 +76,10 @@
 
 
 
-
+(defmethod biztask:task-depends-directry-p ((self biztask:abstract-task)
+                                            (task biztask:abstract-task))
+  (loop for dep in (oref self depends) do
+        (when (eq dep task) (return t))))
 
 (defmethod biztask:task-depends-recursively-p ((self biztask:abstract-task) 
                                                (task biztask:abstract-task))
@@ -165,6 +168,37 @@
           (oset self depends (cons dep deps)))))
     self))
 
+(eval-after-load "yatest"
+  '(yatest::define-test biztask biztask:task-resolve-refs
+     (let* ((tasks (mapcar 'biztask:task-resolve-refs
+                          (biztask1
+                           '(
+                             ("TEST" :cost 1 :depends ("x" "y"))
+                             ("a")
+                             ("b"  :depends ("a"))
+                             ("x"  :depends ("a" "b" ))
+                             ("y"  :depends ("b"))
+                             )
+                           (make-hash-table :test 'equal))))
+            (TEST (nth 0 tasks))
+            (a    (nth 1 tasks))
+            (b    (nth 2 tasks))
+            (x    (nth 3 tasks))
+            (y    (nth 4 tasks)))
+       (yatest::p "TEST" TEST)
+       (yatest::p "a" a)
+       (yatest::p "b" b)
+       (yatest::p "x" x)
+       (yatest::p "y" y)
+       (yatest "TEST<-(x)"    (biztask:task-depends-directry-p TEST x))
+       (yatest "TEST<-(y)"    (biztask:task-depends-directry-p TEST y))
+       (yatest "!x<-(a)" (not (biztask:task-depends-directry-p x a)))
+       (yatest "x<-(b)"       (biztask:task-depends-directry-p x b))
+       (yatest "y<-(b)"       (biztask:task-depends-directry-p y b))
+       (yatest "b<-(a)"       (biztask:task-depends-directry-p b a))
+       (yatest "a<-()"  (null (biztask:task-depends a)))
+       )))
+;;(yatest::run 'biztask 'biztask:task-resolve-refs)
 
 
 
