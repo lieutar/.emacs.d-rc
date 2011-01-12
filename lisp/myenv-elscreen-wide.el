@@ -1,19 +1,6 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(rc-load "jweather")
-(setq jweather:image-magick:convert "/usr/bin/convert")
-(setq jweather:weather-chart:pixel-size 200)
 
 
-(setq jweather:default-position
-      (acman-get "*persona* formal pref"))
-
-(rc-load "myenv-gadget-clock")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(elsp:set-environment
+(elsx:set-environment
  '(0 main 1 twit)
  '((main
     :color      ("#554433" . "#F8F8F0")
@@ -24,7 +11,7 @@
      ((- :size 84)
       (:size 4
        :name clock
-       :init (lambda () (myenv:gadget:clock)))
+       :init (lambda () (ebadget:clock)))
       (:name find-git
        :init (lambda () (find-git "~" :popup 'current-window)))
       (:name eshell

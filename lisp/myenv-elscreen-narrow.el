@@ -1,4 +1,4 @@
-(elsp:set-environment
+(elsx:set-environment
  '(0 main)
  '((main
     :focus     agenda

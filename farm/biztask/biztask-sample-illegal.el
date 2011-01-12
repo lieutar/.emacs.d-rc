@@ -1,3 +1,5 @@
+
+(require 'biztask)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (let ((graph (biztask
  '(
@@ -22,5 +24,6 @@
                      (mapcar 'biztask:task-to-string (biztask:node-out node))
                      )))
   (biztask:graph:preview graph))
+
 
 

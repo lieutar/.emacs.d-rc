@@ -68,18 +68,141 @@
   :documentation ()
   :abstract      t)
 
+
+
+
+
 (defmethod biztask:task-label ((self biztask:abstract-task)) "")
+
+
+
+(defmethod biztask:task-depends-directry-p ((self biztask:abstract-task)
+                                            (task biztask:abstract-task))
+  (loop for dep in (oref self depends) do
+        (when (eq dep task) (return t))))
+
+(defmethod biztask:task-depends-recursively-p ((self biztask:abstract-task) 
+                                               (task biztask:abstract-task))
+  (let ((deps (biztask:task-depends self)))
+    (or (eq   self task)
+        (and (memq task deps) t)
+        (let ((R nil))
+          (while deps
+            (let ((dep (car deps)))
+              (setq deps 
+                    (if (biztask:task-depends-recursively-p dep task)
+                        (progn
+                          (setq R t)
+                          nil)
+                      (cdr deps)))))
+          R))))
+
+(eval-after-load "yatest"
+  '(yatest::define-test
+     biztask biztask:task-depends-recursively-p
+     (let ((tasks (mapcar 'biztask:task-resolve-refs
+                          (biztask1
+                           '(
+                             ("a")
+                             ("b" :depends ("a"))
+                             ("c" :depends ("b"))
+                             ("d" :depends ("a" "c"))
+                             )
+                           (make-hash-table :test 'equal)))))
+       (let ((a (nth 0 tasks))
+             (b (nth 1 tasks))
+             (c (nth 2 tasks))
+             (d (nth 3 tasks)))
+         (yatest "test by self"
+                 (biztask:task-depends-recursively-p a a))
+         (yatest "negative simply"
+                 (not (biztask:task-depends-recursively-p a b)))
+         (yatest "positie simply"
+                 (biztask:task-depends-recursively-p b a))
+         (yatest "positive recursively"
+                 (biztask:task-depends-recursively-p c a))
+         ))))
+;; (yatest::run 'biztask 'biztask:task-depends-recursively-p)
+
+
+
+
 
 (defmethod biztask:task-attributes ((self biztask:abstract-task))
   (when (biztask:task-on-the-critical-path self)
     "style=bold"))
 
+
+
+
+
 (defmethod biztask:task-resolve-refs ((self biztask:abstract-task))
-  (oset self depends (mapcar 
-                      (lambda (dep)
-                        (biztask:task-resolve-refs dep))
-                      (oref self depends)))
-  self)
+  ;; まず依存タスクの参照を解決する
+  (let* ((src (mapcar 'biztask:task-resolve-refs (biztask:task-depends self))))
+    ;; 一旦依存タスクを削除してから再登録する
+    (oset self depends ())
+    ;; 依存タスクの参照を解決し、相互依存の解決を行う
+    (dolist (dep src)
+      (let ((deps (oref self depends)))
+        (when (cond
+               ;; 登録対象タスクが登録先に依存している場合は登録を見送る
+               ((biztask:task-depends-recursively-p dep self)
+                nil)
+ 
+               ;; 登録対象タスクが、登録済依存タスクに依存している場合
+               ;; その登録済依存タスクを削除し、登録対象タスクで置き換える
+               ((loop for odep in deps do
+                      (when (biztask:task-depends-recursively-p dep odep)
+                        (setq deps1 (delq odep deps))
+                        (return t)))
+                t)
+
+               ;; 登録対象タクに依存しているタスクがある場合は、登録を見送る
+               ((loop for odep in deps do
+                      (when (biztask:task-depends-recursively-p
+                             odep dep) (return t)))
+                nil)
+
+               ;; それ以外の場合は単純に登録する
+               (t t))
+          (oset self depends (cons dep deps)))))
+    self))
+
+(eval-after-load "yatest"
+  '(yatest::define-test biztask biztask:task-resolve-refs
+     (let* ((tasks (mapcar 'biztask:task-resolve-refs
+                          (biztask1
+                           '(
+                             ("TEST" :cost 1 :depends ("x" "y"))
+                             ("a")
+                             ("b"  :depends ("a"))
+                             ("x"  :depends ("a" "b" ))
+                             ("y"  :depends ("b"))
+                             )
+                           (make-hash-table :test 'equal))))
+            (TEST (nth 0 tasks))
+            (a    (nth 1 tasks))
+            (b    (nth 2 tasks))
+            (x    (nth 3 tasks))
+            (y    (nth 4 tasks)))
+       (yatest::p "TEST" TEST)
+       (yatest::p "a" a)
+       (yatest::p "b" b)
+       (yatest::p "x" x)
+       (yatest::p "y" y)
+       (yatest "TEST<-(x)"    (biztask:task-depends-directry-p TEST x))
+       (yatest "TEST<-(y)"    (biztask:task-depends-directry-p TEST y))
+       (yatest "!x<-(a)" (not (biztask:task-depends-directry-p x a)))
+       (yatest "x<-(b)"       (biztask:task-depends-directry-p x b))
+       (yatest "y<-(b)"       (biztask:task-depends-directry-p y b))
+       (yatest "b<-(a)"       (biztask:task-depends-directry-p b a))
+       (yatest "a<-()"  (null (biztask:task-depends a)))
+       )))
+;;(yatest::run 'biztask 'biztask:task-resolve-refs)
+
+
+
+
 
 (defmethod biztask:task-to-string ((self biztask:abstract-task))
   (format "%s:%s:%s"
@@ -87,9 +210,17 @@
           (biztask:task-name self)
           (biztask:node-to-string (biztask:task-end-node   self))))
 
+
+
+
+;;
 (defmethod biztask:task-depends-to ((self biztask:abstract-task)
                                     (dep biztask:abstract-task))
-  (oset self depends (cons dep (biztask:task-depends self))))
+  (oset self depends (cons dep (oref self depends))))
+
+
+
+
 
 
 (defclass biztask:task (biztask:abstract-task)
@@ -104,11 +235,23 @@
     :writer   biztask:task-set-cost))
   :documentation "")
 
+
+
+
+
 (defun biztask:task:new (&rest args)
   (apply 'make-instance biztask:task args))
+
+
+
+
+
 (defmethod biztask:task-label ((self biztask:task)) 
   (concat (biztask:task-name self)
           (if (oref self cost) (format "\n%s" (oref self cost)) "")))
+
+
+
 
 
 (defclass biztask:choice (biztask:abstract-task)
@@ -116,14 +259,26 @@
     :initform ()))
   :doxumentation "")
 
+
+
+
+
 (defmethod biztask:choice:add-candidate ((self biztask:choice)
                                          (task biztask:abstract-task))
   (oset self candidates (cons task (oref self candidates))))
+
+
+
+
 
 (defun biztask:choice:new (&rest tasks)
   (let ((self (make-instance biztask:choice)))
     (dolist (task tasks) (biztask:choice:add-candidate self task))
     self))
+
+
+
+
 
 (defclass biztask:ref-task (biztask:abstract-task)
   ((name
@@ -135,11 +290,23 @@
     :type hash-table))
   :documentation "")
 
+
+
+
+
 (defun biztask:ref-task:new (name dic)
   (make-instance biztask:ref-task :name name :dic dic))
 
+
+
+
+
 (defun biztask:ref-task:task-resolve-refs (self)
   (gethash (oref self name) (oref self dic)))
+
+
+
+
 
 (defmethod biztask:task-resolve-refs ((self biztask:ref-task))
   (let ((dst (biztask:ref-task:task-resolve-refs self)))
@@ -148,11 +315,17 @@
     dst))
 
 
+
+
+
 (defclass biztask:null-task (biztask:abstract-task)
   ()
   :documentatiion "")
 (defun biztask:null-task:new ()
   (make-instance biztask:null-task))
+
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -174,6 +347,10 @@
     :initform ()
     :reader biztask:node-out)))
 
+
+
+
+
 (defvar biztask:node:count 0)
 
 (defun biztask:node:new (&rest args)
@@ -183,14 +360,30 @@
                    (1+ biztask:node:count))
          args))
 
+
+
+
+
 (defmethod biztask:node-add-in  ((self biztask:node) task)
   (oset self in (cons task (oref self in))))
+
+
+
+
 
 (defmethod biztask:node-add-out ((self biztask:node) task)
   (oset self out (cons task (oref self out))))
 
+
+
+
+
 (defmethod biztask:node-to-label ((self biztask:node))
   (format "%s" (oref self symbol)))
+
+
+
+
 
 (defmethod biztask:node-to-string ((self biztask:node))
   (format "(%s%s)"
@@ -224,24 +417,37 @@
   :documentation "")
 
 
-(defmethod biztask:graph:rearrange-nodes ((graph biztask:graph))
-  (dolist (task (biztask:graph-edges graph))
-    (let ((from (biztask:task-start-node task))
-          (to   (biztask:task-end-node   task)))
-      (when (eq from to)
-        (let ((new-to (biztask:graph-allocate-node graph)))
-          (dolist (out (biztask:node-out from))
-            (if (eq to (biztask:task-end-node out))
-                (biztask:task-set-end-node out new-to)
-              (biztask:task-set-start-node out new-to))))))))
+
+
+
+;; (defmethod biztask:graph:rearrange-nodes ((graph biztask:graph))
+;;   (dolist (task (biztask:graph-edges graph))
+;;     (let ((from (biztask:task-start-node task))
+;;           (to   (biztask:task-end-node   task)))
+;;       (when (eq from to)
+;;         (let ((new-to (biztask:graph-allocate-node graph)))
+;;           (dolist (out (biztask:node-out from))
+;;             (if (eq to (biztask:task-end-node out))
+;;                 (biztask:task-set-end-node out new-to)
+;;               (biztask:task-set-start-node out new-to))))))))
+
+
+
 
 
 (defmethod biztask:task-to-graph ((self biztask:task))
   (let* ((graph (biztask:graph:new (biztask:task-name self))))
     (dolist (dep (biztask:task-depends self))
       (biztask:graph-add-task graph dep (biztask:graph-end graph)))
-    (biztask:graph:rearrange-nodes graph)
+
+;;    (biztask:graph:rearrange-nodes graph)
+
+    (biztask:graph-set-node-symbols graph)
+
     graph))
+
+
+
 
 
 (defun biztask:graph:new (name)
@@ -253,11 +459,19 @@
    :start start
    :end   end)))
 
+
+
+
+
 ;(defun biztask:graph-allocate-node (self)
 (defmethod biztask:graph-allocate-node ((self biztask:graph))
   (let* ((node   (biztask:node:new)))
     (oset graph nodes (cons node (oref graph nodes)))
     node))
+
+
+
+
 
 (defmethod biztask:graph-add-edge ((self biztask:graph) from to task)
   (oset self edges (cons task (oref self edges)))
@@ -265,6 +479,8 @@
   (biztask:task-set-end-node   task to)
   (biztask:node-add-in  to   task)
   (biztask:node-add-out from task))
+
+
 
 
 
@@ -308,6 +524,9 @@
             (biztask:graph-add-task graph dep from)))))))
 
 
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defsubst biztask:dot-quote (src)
@@ -318,6 +537,9 @@
                         (format "%S" src)))))
         (replace-regexp-in-string "\n" "\\\\n" (format "%S" src)))
     ""))
+
+
+
 
 
 (defun biztask:graph-find-pathes1 (self from end dic)
@@ -337,6 +559,10 @@
                      (biztask:graph-find-pathes1 (to self end dic))))))
               (biztask:node-out self))))))
 
+
+
+
+
 (defun biztask:graph-find-pathes (self)
   (let ((dic   (make-hash-table :test 'equal))
         (start (biztask:graph-start self))
@@ -347,6 +573,10 @@
               (biztask:graph-find-pathes1
                (biztask:task-end-node task) start end dic))
             (biztask:node-out start)))))
+
+
+
+
 
 (defun biztask:graph-mark-critical-path (self)
   (let ((max-cost 0)
@@ -370,6 +600,10 @@
     (dolist (task critical-path)
       (biztask:task-set-on-the-critical-path task t))
     critical-path))
+
+
+
+
 
 (defun biztask:graph-set-node-symbols (self)
   (labels
@@ -400,8 +634,10 @@
                                   (biztask:node-out node))))))))))
 
 
+
+
+
 (defmethod biztask:graph-to-dot ((self biztask:graph) &rest opts)
-  (biztask:graph-set-node-symbols self)
 
   (format
    "
@@ -409,6 +645,7 @@ digraph \"%s\" {
 
   rankdir=%s
   fontsize=8
+  pad=0.2
 
   graph [
         label = \"%s\"
@@ -428,6 +665,7 @@ digraph \"%s\" {
      arrowhead = lvee
       fontsize = 8
      arrowsize = 0.5
+           sep = 10
   ]
 
   start [
@@ -479,6 +717,7 @@ digraph \"%s\" {
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 (defun biztask1 (spec dic &optional depends)
   (when spec
     (if (stringp spec)
@@ -497,9 +736,9 @@ digraph \"%s\" {
                    (biztask:task:new
                     :name    car
                     :cost    (plist-get (cdr spec) :cost)
-                    :depends (biztask1  (plist-get (cdr spec) :depends)
-                                        dic
-                                        t))))
+                    :depends (biztask1 (plist-get (cdr spec) :depends)
+                                       dic
+                                       t))))
               (puthash car task dic)
               task)))
 
@@ -525,13 +764,18 @@ digraph \"%s\" {
 
 
 
-(defun biztask (spec &optional actions)
-  (let ((obj (biztask1 spec (make-hash-table :test 'equal))))
+
+
+(defun biztask (spec &optional actions &rest opts)
+  (let ((obj (biztask1 spec (make-hash-table :test 'equal)))
+        (biztask:node:count 0))
     (let ((obj (if (listp obj)
                    (mapcar 'biztask:task-resolve-refs obj)
                  (biztask:task-resolve-refs obj))))
       (dolist (action actions) (setq obj (funcall action obj)))
       obj)))
+
+
 
 
 
@@ -546,12 +790,18 @@ digraph \"%s\" {
       (pop-to-buffer buf))))
 
 
+
+
+
 (defmethod biztask:graph:save-dot ((self biztask:graph) file &rest opts)
   (with-temp-buffer
     (insert (apply 'biztask:graph-to-dot self opts))
     (setq buffer-file-name file)
     (save-buffer))
   file)
+
+
+
 
 
 (defun biztask:graph:preview:sentinel  (dotf svgf args)
@@ -569,6 +819,9 @@ digraph \"%s\" {
                               (buffer-substring (point-min)(point-max)))))
                (kill-buffer buf)
                (error "%s\n%s" sign content)))))))
+
+
+
 
 
 (defmethod biztask:graph:preview ((self biztask:graph) &rest opts)

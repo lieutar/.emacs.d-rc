@@ -49,21 +49,21 @@
      (define-key elscreen-map (kbd"C-t") 'my-rc-anything-elscreen))
 
 
-   (define-key elscreen-map (kbd "C-c") 'elsp:create)
+   (define-key elscreen-map (kbd "C-c") 'elsx:create)
 
    (defun my-rc-3cols-environment ()
-     (require 'elsp)
+     (require 'elsx)
      (rc-load "myenv-elscreen-3cols")
-     (elsp:after-goto))
+     (elsx:after-goto))
 
    (defun my-rc-wide-screen-environment ()
-     (require 'elsp)
+     (require 'elsx)
      (rc-load "myenv-elscreen-wide")
-     (elsp:after-goto))
+     (elsx:after-goto))
 
    (defun my-rc-narrow-screen-environment ()
-     (require 'elsp)
+     (require 'elsx)
      (rc-load "myenv-elscreen-narrow")
-     (elsp:after-goto))
+     (elsx:after-goto))
    ))
 
