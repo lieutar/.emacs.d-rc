@@ -2,7 +2,6 @@
  '(0 main)
  '((main
     :focus     agenda
-    :preinit   (lambda () (calendar))
     :composition
     ((|)
      (:name main :size 84)
@@ -15,8 +14,8 @@
    (default
      :composition
      ((|)
-      (:size 84)
-      (:size nil))
+      (:size 84  :name main-1)
+      (:size nil :name main-2))
      ))
  )
 
