@@ -138,7 +138,8 @@
 
 (defmethod biztask:task-resolve-refs ((self biztask:abstract-task))
   ;; まず依存タスクの参照を解決する
-  (let* ((src (mapcar 'biztask:task-resolve-refs (biztask:task-depends self))))
+  (let* ((src (mapcar 'biztask:task-resolve-refs
+                      (biztask:task-depends self))))
     ;; 一旦依存タスクを削除してから再登録する
     (oset self depends ())
     ;; 依存タスクの参照を解決し、相互依存の解決を行う
@@ -148,16 +149,16 @@
                ;; 登録対象タスクが登録先に依存している場合は登録を見送る
                ((biztask:task-depends-recursively-p dep self)
                 nil)
- 
+
                ;; 登録対象タスクが、登録済依存タスクに依存している場合
                ;; その登録済依存タスクを削除し、登録対象タスクで置き換える
                ((loop for odep in deps do
                       (when (biztask:task-depends-recursively-p dep odep)
-                        (setq deps1 (delq odep deps))
+                        (setq deps (delq odep deps))
                         (return t)))
                 t)
 
-               ;; 登録対象タクに依存しているタスクがある場合は、登録を見送る
+               ;; 登録対象タスクに依存しているタスクがある場合は、登録を見送る
                ((loop for odep in deps do
                       (when (biztask:task-depends-recursively-p
                              odep dep) (return t)))
@@ -185,11 +186,6 @@
             (b    (nth 2 tasks))
             (x    (nth 3 tasks))
             (y    (nth 4 tasks)))
-       (yatest::p "TEST" TEST)
-       (yatest::p "a" a)
-       (yatest::p "b" b)
-       (yatest::p "x" x)
-       (yatest::p "y" y)
        (yatest "TEST<-(x)"    (biztask:task-depends-directry-p TEST x))
        (yatest "TEST<-(y)"    (biztask:task-depends-directry-p TEST y))
        (yatest "!x<-(a)" (not (biztask:task-depends-directry-p x a)))
