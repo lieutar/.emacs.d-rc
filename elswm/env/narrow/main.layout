@@ -1,0 +1,14 @@
+;;-*-emacs-lisp-*-
+
+(
+    :focus     agenda
+    :composition
+    ((|)
+     (:name main :size 84)
+     ((-)
+      (:name tw-home
+       :init (lambda () (twit)))
+      (:name tw-mentions
+       :init (lambda () (twittering-visit-timeline ":mentions")))))
+)
+

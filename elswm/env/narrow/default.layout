@@ -1,0 +1,7 @@
+;;-*-emacs-lisp-*-
+(
+ :composition
+ ((|)
+   (:size 84  :name main-1)
+   (:size nil :name main-2))
+)

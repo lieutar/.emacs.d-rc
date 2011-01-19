@@ -27,9 +27,8 @@
 (require 'eieio)
 (defvar biztask:dot-program      "dot")
 (defvar biztask:preview-suffix   "png")
-;;(setq biztask:preview-suffix   "png")
 (defvar biztask:preview-function 'biztask:default-preview-function)
-;;(setq biztask:preview-function 'biztask:default-preview-function)
+
 
 (defconst biztask:default-preview-functin:buffer nil)
 (defun biztask:default-preview-function (file)
@@ -416,16 +415,16 @@
 
 
 
-;; (defmethod biztask:graph:rearrange-nodes ((graph biztask:graph))
-;;   (dolist (task (biztask:graph-edges graph))
-;;     (let ((from (biztask:task-start-node task))
-;;           (to   (biztask:task-end-node   task)))
-;;       (when (eq from to)
-;;         (let ((new-to (biztask:graph-allocate-node graph)))
-;;           (dolist (out (biztask:node-out from))
-;;             (if (eq to (biztask:task-end-node out))
-;;                 (biztask:task-set-end-node out new-to)
-;;               (biztask:task-set-start-node out new-to))))))))
+(defmethod biztask:graph:rearrange-nodes ((graph biztask:graph))
+  (dolist (task (biztask:graph-edges graph))
+    (let ((from (biztask:task-start-node task))
+          (to   (biztask:task-end-node   task)))
+      (when (eq from to)
+        (let ((new-to (biztask:graph-allocate-node graph)))
+          (dolist (out (biztask:node-out from))
+            (if (eq to (biztask:task-end-node out))
+                (biztask:task-set-end-node out new-to)
+              (biztask:task-set-start-node out new-to))))))))
 
 
 
@@ -436,7 +435,7 @@
     (dolist (dep (biztask:task-depends self))
       (biztask:graph-add-task graph dep (biztask:graph-end graph)))
 
-;;    (biztask:graph:rearrange-nodes graph)
+    (biztask:graph:rearrange-nodes graph)
 
     (biztask:graph-set-node-symbols graph)
 
@@ -536,18 +535,16 @@
 
 
 
-
-
 (defun biztask:graph-find-pathes1 (self from end dic)
-  (let (key (format "%s %s %s"
-                    (biztask:node-id from)
-                    (biztask:node-id self)))
+  (let ((key (format "%s %s"
+                     (biztask:node-id from)
+                     (biztask:node-id self))))
     (unless (gethash key dic)
       (puthash key t dic)
       (apply 'append
              (mapcar
               (lambda (task)
-                (let* ((to  (biztask:task-end task)))
+                (let* ((to  (biztask:task-end-node task)))
                   (if (eq to end)
                       (list task)
                     (mapcar
@@ -558,11 +555,10 @@
 
 
 
-
 (defun biztask:graph-find-pathes (self)
   (let ((dic   (make-hash-table :test 'equal))
         (start (biztask:graph-start self))
-        (end   (biztask:graph-end   end)))
+        (end   (biztask:graph-end   self)))
     (apply 'append
            (mapcar
             (lambda (task)
@@ -570,6 +566,26 @@
                (biztask:task-end-node task) start end dic))
             (biztask:node-out start)))))
 
+(eval-after-load "yatest"
+  '(yatest::define-test
+    biztask biztask:graph-find-pathes
+    (let ((path-match
+           (lambda (path test)
+             (and (= (length path)(length test))
+                  (not (loop for n from 0 to (1- (length path)) do
+                             (unless (equal (nth n test)
+                                            (biztask:task-name (nth n path)))
+                               (return t))))))))
+      (let* ((graph (biztask
+                     '(sequence ("a") ("b") ("c"))
+                     '(biztask:task-to-graph)))
+             (pathes (biztask:graph-find-pathes graph)))
+        (yatest "simple length"     (= 1 (length pathes)))
+        (yatest "simple path-match" (funcall path-match 
+                                             (yatest::p "(car pathes)"
+                                                        (car pathes)) '("a" "b"))))
+      )))
+;;(yatest::run 'biztask 'biztask:graph-find-pathes)
 
 
 

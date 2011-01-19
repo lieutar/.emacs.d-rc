@@ -1,8 +1,5 @@
-
-
-(elsx:set-environment
- '(0 main 1 twit)
- '((main
+;;-*-emacs-lisp-*-
+(
     :color      ("#554433" . "#F8F8F0")
     :focus      agenda
     :preinit    (lambda () (calendar))
@@ -31,19 +28,3 @@
                    (text-scale-set 2))
                  (and (re-search-forward "^\\*\\* Log" nil t)
                       (beginning-of-line))))))))
-   (twit
-    :color ("#335566" . "#F0FCFC")
-    :focus tw-home
-    :composition
-    ((|)
-     (:name tw-home     :init (lambda () (twit)))
-     (:name tw-mentions :init (lambda ()
-                                (twittering-visit-timeline ":mentions")))))
-
-   (default
-     :composition
-     ((|)
-      (:size 84)
-      (:size nil))
-     )))
-

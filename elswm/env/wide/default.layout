@@ -1,0 +1,6 @@
+(
+  :composition
+  ((|)
+   (:size 84)
+   (:size nil))
+)

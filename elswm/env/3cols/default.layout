@@ -1,0 +1,65 @@
+;;-*- emacs-lisp -*-
+(
+ :focus  main-2
+ :pop-to info
+ :composition
+ ((-)
+  ((| :size 4)
+   (:name slogan
+     :size 85
+     :init (lambda () (ebadget:slogan)))
+
+   (:name clock :init (lambda () (ebadget:clock))))
+
+  ((| :size 50)
+
+   ((- :size 85)
+    (:name main-1
+     :onfocus (lambda ()
+                (elswm-util:shlink-vertically  8 'info)
+                (elswm-util:shlink-vertically 10 'main-4))
+     :onblur  (lambda (win)
+                (message "*main-1*")
+                (elswm-util:shlink-vertically 40 'main-1))
+     :init    (lambda () (switch-to-buffer "*scratch*")))
+    (:name main-4
+     :onfocus (lambda ()
+                (elswm-util:shlink-vertically  8 'info)
+                (elswm-util:shlink-vertically 10 'main-1))
+     :init    (lambda () (switch-to-buffer "*scratch*")))
+    )
+
+   ((- :size 85)
+    (:name main-2
+     :onfocus (lambda ()
+                (elswm-util:shlink-vertically  8 'info)
+                (elswm-util:shlink-vertically 10 'main-5))
+     :init    (lambda () (switch-to-buffer "*scratch*")))
+    (:name main-5
+     :onfocus (lambda ()
+                (elswm-util:shlink-vertically  8 'info)
+                (elswm-util:shlink-vertically 10 'main-2))
+     :init    (lambda () (switch-to-buffer "*scratch*")))
+    )
+
+   ((- :size nil)
+    (:name main-3 :size nil
+           :onfocus (lambda ()
+                      (elswm-util:shlink-vertically  8 'info)
+                      (elswm-util:shlink-vertically 10 'main-6))
+           :init    (lambda () (switch-to-buffer "*scratch*")))
+    (:name main-6 :size nil
+           :onfocus (lambda ()
+                      (elswm-util:shlink-vertically  8 'info)
+                      (elswm-util:shlink-vertically 10 'main-3))
+           :init    (lambda () (switch-to-buffer "*scratch*")))
+    )
+   )
+
+  (:name info  :size nil :pop-to main-1
+         :onfocus (lambda () (elswm-util:widen-vertically 40))
+         :init (lambda () (switch-to-buffer "*scratch*")))
+  );; end of composition
+ );;end of default
+
+

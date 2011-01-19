@@ -24,13 +24,15 @@
    }
  // solar position1 (celestial longitude, degree)
  function spls(t) { // t: Julius year
-   l = 280.4603 + 360.00769 * t 
+  var l = 280.4603 + 360.00769 * t 
      + (1.9146 - 0.00005 * t) * sind(357.538 + 359.991 * t)
      + 0.0200 * sind(355.05 +  719.981 * t)
      + 0.0048 * sind(234.95 +   19.341 * t)
      + 0.0020 * sind(247.1  +  329.640 * t)
+
      + 0.0018 * sind(297.8  + 4452.67  * t)
      + 0.0018 * sind(251.3  +    0.20  * t)
+
      + 0.0015 * sind(343.2  +  450.37  * t)
      + 0.0013 * sind( 81.4  +  225.18  * t)
      + 0.0008 * sind(132.5  +  659.29  * t)
@@ -55,7 +57,7 @@
      + 0.000030 * sind( 90.0)
      + 0.000013 * sind( 27.8 + 4452.67 * t)
      + 0.000007 * sind(254   +  450.4  * t)
-     + 0.000007 * sind(156   +  329.6  * t)
+     + 0.000007 * sind(156   +  329.6  * t);
    r = Math.pow(10,r) ;
    return r ;
    }
@@ -182,16 +184,77 @@ function calc(f) { // main routine
   }
  f.result.value = ans ;
  }
-function conv(f) { // convert site data
- locst = f.location.value ;
- f.lat.value = locst.substring(0,9) ;
- f.lon.value = locst.substring(9,18) ;
- f.alt.value = locst.substring(19,25) ;
- f.def.value = locst.substring(26,28) ;
- }
-function today(f) { // get doday
- Td = new Date() ;
- f.year.value = Td.getFullYear() ;
- f.month.value = Td.getMonth() + 1 ;
- f.dayn.value = Td.getDate() ;
+
+
+function calc_at_time(lo,la,alt,yy,mm,dd,hh,m,i){
+  var tt = jy(yy,mm,dd,hh,m,0,i) ;
+  var th = sh(tt,hh,m,0,lo,i) ;
+  var ds = spds(tt) ;
+  var ls = spls(tt) ;
+  var alp = spal(tt) ;
+  var dlt = spdl(tt) ;
+  var ht = soal(la,th,alp,dlt) ;
+  var dr = sodr(la,th,alp,dlt) ;
+  var ttt = eandp(alt,ds) ;
+  var t1 = ttt - 18 ;
+  var t2 = ttt - 12 ;
+  var t3 = ttt - 6 ;
+  var t4 = sa(alt,ds) ;
+  return ";; " +
+    ( "tt th ds ls alp dlt ht dr ttt t1 t2 t3 t4".split(/\s+/).map(
+        function(sym){
+          return sym + " " + eval("(" + sym + ")");
+        }
+      ).join("\n;; ") )+ "\n";
+}
+
+
+
+
+function calc2(la,lo,alt, yy,mm,dd,i) { // main routine
+ ans = yy + "年" + mm + "月" + dd + "日の計算結果\n" ;
+
+ t = jy(yy,mm,dd-1,23,59,0,i) ;
+ th = sh(t,23,59,0,lo,i) ;
+ ds = spds(t) ;
+ ls = spls(t) ;
+ alp = spal(t) ;
+ dlt = spdl(t) ;
+ pht = soal(la,th,alp,dlt) ;
+ pdr = sodr(la,th,alp,dlt) ;
+
+ for(hh=0; hh<24; hh++) {
+  for(m=0; m<60; m++) {
+   t = jy(yy,mm,dd,hh,m,0,i) ;
+   th = sh(t,hh,m,0,lo,i) ;
+   ds = spds(t) ;
+   ls = spls(t) ;
+   alp = spal(t) ;
+   dlt = spdl(t) ;
+   ht = soal(la,th,alp,dlt) ;
+   dr = sodr(la,th,alp,dlt) ;
+   tt = eandp(alt,ds) ;
+   t1 = tt - 18 ;
+   t2 = tt - 12 ;
+   t3 = tt - 6 ;
+   t4 = sa(alt,ds) ;
+ // Solar check 
+ // 0: non, 1: astronomical twilight start , 2: voyage twilight start,
+ // 3: citizen twilight start, 4: sun rise, 5: meridian, 6: sun set,
+ // 7: citizen twilight end, 8: voyage twilight end,
+ // 9: astronomical twilight end
+   if((pht<t1)&&(ht>t1)) ans += hh + "時" + m + "分 天文薄明始まり\n" ;
+   if((pht<t2)&&(ht>t2)) ans += hh + "時" + m + "分 航海薄明始まり\n" ;
+   if((pht<t3)&&(ht>t3)) ans += hh + "時" + m + "分 市民薄明始まり\n" ;
+   if((pht<t4)&&(ht>t4)) ans += hh + "時" + m + "分 日出(方位" + Math.floor(dr) +"度)\n" ;
+   if((pdr<180)&&(dr>180)) ans += hh + "時" + m + "分 南中(高度" +Math.floor(ht)+"度)\n" ;
+   if((pht>t4)&&(ht<t4)) ans += hh + "時" + m + "分 日没(方位" + Math.floor(dr) +"度)\n" ;
+   if((pht>t3)&&(ht<t3)) ans += hh + "時" + m + "分 市民薄明終わり\n" ;
+   if((pht>t2)&&(ht<t2)) ans += hh + "時" + m + "分 航海薄明終わり\n" ;
+   if((pht>t1)&&(ht<t1)) ans += hh + "時" + m + "分 天文薄明終わり\n" ;
+   pht = ht ;
+   pdr = dr ;
+   }
+  }
+  return ans;
  }

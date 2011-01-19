@@ -1,0 +1,31 @@
+;-*-emacs-lisp-*-
+(
+ :composition
+ ((- :size 256)
+   ((| :size 37)
+     ((- :size 128)
+       (:name nil
+        :size 18
+        :init (lambda ()
+                (switch-to-buffer "*Messages*"))
+        :onfocus nil
+        :pop-to nil)
+       (:name nil
+        :size 19
+        :init (lambda ()
+                (switch-to-buffer "*scratch*"))
+        :onfocus nil
+        :pop-to nil))
+     (:name nil
+      :size 128
+      :init (lambda ()
+              (switch-to-buffer "*scratch*"))
+      :onfocus nil
+      :pop-to nil))
+   (:name nil
+    :size 37
+    :init (lambda ()
+            (switch-to-buffer "*scratch*"))
+    :onfocus nil
+    :pop-to nil))
+)

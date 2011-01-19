@@ -40,30 +40,11 @@
    (add-hook 'elscreen-screen-update-hook 'elscreen-frame-title-update)
 
    (when (locate-library "anything-config")
-
      (defun my-rc-anything-elscreen ()
        (interactive)
        (anything 'anything-c-source-elscreen)
        nil nil nil nil "*elscreen*")
-
      (define-key elscreen-map (kbd"C-t") 'my-rc-anything-elscreen))
 
-
-   (define-key elscreen-map (kbd "C-c") 'elsx:create)
-
-   (defun my-rc-3cols-environment ()
-     (require 'elsx)
-     (rc-load "myenv-elscreen-3cols")
-     (elsx:after-goto))
-
-   (defun my-rc-wide-screen-environment ()
-     (require 'elsx)
-     (rc-load "myenv-elscreen-wide")
-     (elsx:after-goto))
-
-   (defun my-rc-narrow-screen-environment ()
-     (require 'elsx)
-     (rc-load "myenv-elscreen-narrow")
-     (elsx:after-goto))
    ))
 

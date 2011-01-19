@@ -24,6 +24,7 @@
    )
  )
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (rc-ext
@@ -116,3 +117,34 @@
        )
       :buffer "*open-files*"))
    ))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(rc-ext
+ :name 'anything-gtags
+ :get  "http://www.emacswiki.org/cgi-bin/wiki/download/anything-gtags.el"
+ :requires '(
+             anything
+             gtags
+             )
+ :autoload '(anything-gtags-select
+             anything-gtags-resume
+             my-anything-gtags)
+ :init
+ (lambda ()
+   (defconst anything-c-source-my-anything-g-tags-commands
+     '((name . "Gtags Commands")
+       (candidates . (lambda () '( gtags-find-tag
+                                   gtags-find-rtag
+                                   gtags-find-symbol
+                                   gtags-find-pattern
+                                   gtags-find-file
+                                   gtags-pop-stack
+                                   anything-gtags-select
+                                   anything-gtags-resume
+                                  )))
+       (type . command)))
+   (defun my-anything-gtags ()
+     (interactive)
+     (anything :sources '(anything-c-source-my-anything-g-tags-commands)))
+   )
+ )
+

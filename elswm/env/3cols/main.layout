@@ -1,0 +1,56 @@
+;;-*-emacs-lisp-*-
+(
+:color   ("#554433" . "#F8F8F0")
+:focus   agenda
+:pop-to  tw-home
+:init (lambda () (save-window-excursion (calendar)))
+
+:composition
+
+((|)
+ ((- :size 84)
+  (:size 8
+   :name calendar
+   :init (lambda () (switch-to-buffer calendar-buffer)))
+  (:name find-git
+         :pop-to eshell
+         :init (lambda () (find-git "~" :popup 'current-window)))
+  (:name eshell
+         :pop-to find-git
+         :init (lambda () (elswm-util:3cols:init-with-eshell "~"))))
+ 
+ ((-)
+  ((| :size 50)
+   ((- :size 116)
+
+    (:size 4
+     :name slogan
+     :init (lambda () (ebadget:slogan)))
+
+    (:name  agenda
+     :init (lambda ()
+             (when (file-readable-p "~/memo/agenda.org")
+               (find-file  "~/memo/agenda.org")
+               (when (>= emacs-major-version 23)
+                 (text-scale-set 2))
+               (and (re-search-forward "^\\*\\* Log" nil t)
+                    (beginning-of-line))))))
+   ((-)
+    (:size 4
+     :name clock
+     :init (lambda () (ebadget:clock)))
+
+    (:name jweather
+     :init (lambda () (jweather:gadget)))
+
+    (:name scratch
+     :init (lambda () (switch-to-buffer "*scratch*")))))
+
+  ((|)
+   (:name tw-home
+    :init (lambda () (twit))
+    :pop-to tw-mentions)
+
+   (:name tw-mentions
+    :init (lambda () (twittering-visit-timeline ":mentions"))))))
+)

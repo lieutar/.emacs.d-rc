@@ -100,6 +100,7 @@
   ;; S
   ;; T
   (define-key km [?T] 'toggle-truncate-lines)
+
   ;; U
   ;; V
   ;; W
@@ -111,6 +112,7 @@
   (define-key km [?\C-a ?\C-a] 'anything-execute-anything-command)
   (define-key km [?\C-a ?\C-s] 'my-anything-c-yas-complete)
   (define-key km [?\C-a ?\C-q] 'anything-quicklaunch)
+  (define-key km [?\C-a ?g]    'my-anything-gtags)
 
   ;; C-b
   (define-key km [?\C-b] 'anything-buffers+)
