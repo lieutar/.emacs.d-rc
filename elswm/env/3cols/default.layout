@@ -15,6 +15,8 @@
 
    ((- :size 85)
     (:name main-1
+     :pop-to  (:mode    ((info-mode main-2))
+               :default (info))
      :onfocus (lambda ()
                 (elswm-util:shlink-vertically  8 'info)
                 (elswm-util:shlink-vertically 10 'main-4))
@@ -22,7 +24,10 @@
                 (message "*main-1*")
                 (elswm-util:shlink-vertically 40 'main-1))
      :init    (lambda () (switch-to-buffer "*scratch*")))
+
     (:name main-4
+     :pop-to  (:mode    ((info-mode main-5))
+               :default (info))
      :onfocus (lambda ()
                 (elswm-util:shlink-vertically  8 'info)
                 (elswm-util:shlink-vertically 10 'main-1))
@@ -31,11 +36,15 @@
 
    ((- :size 85)
     (:name main-2
+     :pop-to  (:mode    (info-mode main-3)
+               :default (info))
      :onfocus (lambda ()
                 (elswm-util:shlink-vertically  8 'info)
                 (elswm-util:shlink-vertically 10 'main-5))
      :init    (lambda () (switch-to-buffer "*scratch*")))
     (:name main-5
+     :pop-to  (:mode    ((info-mode main-6))
+               :default (info))
      :onfocus (lambda ()
                 (elswm-util:shlink-vertically  8 'info)
                 (elswm-util:shlink-vertically 10 'main-2))
@@ -44,20 +53,32 @@
 
    ((- :size nil)
     (:name main-3 :size nil
-           :onfocus (lambda ()
-                      (elswm-util:shlink-vertically  8 'info)
-                      (elswm-util:shlink-vertically 10 'main-6))
-           :init    (lambda () (switch-to-buffer "*scratch*")))
+     :pop-to  (:mode    (info-mode main-2)
+               :default (info))
+     :onfocus (lambda ()
+                (elswm-util:shlink-vertically  8 'info)
+                (elswm-util:shlink-vertically 10 'main-6))
+     :init    (lambda () (switch-to-buffer "*scratch*")))
     (:name main-6 :size nil
-           :onfocus (lambda ()
-                      (elswm-util:shlink-vertically  8 'info)
-                      (elswm-util:shlink-vertically 10 'main-3))
-           :init    (lambda () (switch-to-buffer "*scratch*")))
+     :pop-to  (:mode    ((info-mode main-5))
+               :default (info))
+     :onfocus (lambda ()
+                (elswm-util:shlink-vertically  8 'info)
+                (elswm-util:shlink-vertically 10 'main-3))
+     :init    (lambda () (switch-to-buffer "*scratch*")))
     )
    )
 
-  (:name info  :size nil :pop-to main-1
-         :onfocus (lambda () (elswm-util:widen-vertically 40))
+  (:name info  :size nil :pop-to (main-1 main-2 main-3 main-4 main-5 main-6)
+         :onfocus (lambda ()
+                    (elswm-util:widen-vertically  40)
+                    (elswm-util:widen-vertically 15 'main-1)
+                    (elswm-util:widen-vertically 15 'main-2)
+                    (elswm-util:widen-vertically 15 'main-3)
+                    (elswm-util:widen-vertically 15 'main-4)
+                    (elswm-util:widen-vertically 15 'main-5)
+                    (elswm-util:widen-vertically 15 'main-6)
+                    )
          :init (lambda () (switch-to-buffer "*scratch*")))
   );; end of composition
  );;end of default

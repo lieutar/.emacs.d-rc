@@ -1,3 +1,4 @@
+(require 'biztask)
 (biztask
  '((sequence
     ("関数、オブジェクトのドメイン分け")

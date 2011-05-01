@@ -24,6 +24,9 @@
 
 ;;; Code:
 
+(require 'cl)
+(defvar elswm-mode nil)
+
 (defgroup elswm ()
   "ELScreen Window Manager."
   )
@@ -59,8 +62,8 @@
   :type '(cons (string :tag "foreground-color") 
                (string :tag "background-color")))
 
-(defcustom elswm-layout-save-default-buffer-names '("*scratch*"
-                                                   "*Messages*")
+(defcustom elswm-layout-write-default-buffer-names '("*scratch*"
+                                                     "*Messages*")
   ""
   :type '(repeat :args (string) :tag "Buffer name")
   :group 'elswm)
@@ -73,13 +76,20 @@
     add-change-log-entry-other-window
     help-do-xref
     windmove-do-window-select
-    anything-display-buffer
     info
     help-window-setup-finish
+    edebug-display-buffer
+    anything-display-buffer
     )
   ""
   :type '(repeat :args (function))
-  :group 'elswm)
+  :group 'elswm
+  :set (lambda (sym val)
+         (set sym val)
+         (when (and elswm-mode
+                    (fboundp 'elswm-ad:setup))
+           (elswm-ad:setup))
+         val))
 
 
 (require 'elswm-core)

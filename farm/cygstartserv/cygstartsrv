@@ -1,0 +1,20 @@
+#! /usr/bin/perl
+use strict;
+use warnings;
+use 5.01;
+package Cygstartsrv;
+use base qw( Net::Server );
+
+sub process_request {
+  my $self = shift;
+  while (<STDIN>) {
+    s/\r?\n$//;
+    system cygstart => $_;
+    say "OK";
+  }
+}
+
+__PACKAGE__->run( port => 8989 );
+
+1;
+__END__

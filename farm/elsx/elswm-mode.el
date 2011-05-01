@@ -35,6 +35,13 @@
 
 (defconst elswm:next-layout-name nil)
 
+(defun elswm:display-buffer-function:default-window (buf)
+  (let* ((windows (window-list))
+         (member  (member (selected-window) windows)))
+    (cond ((> (length member ) 1) (cadr member))
+          ((> (length windows) 1) (car windows))
+          (t (split-window)))))
+
 (defun elswm:display-buffer-function (buffer &optional other-window)
   (let ((win 
          (let ((buf (if (bufferp buffer) buffer (get-buffer buffer))))
@@ -43,18 +50,8 @@
            (or (and (not other-window)
                     (loop for win in (window-list nil) do
                           (when (eq buf (window-buffer win))(return win))))
-               (let* ((props  (elswm-window:attributes))
-                      (name   (plist-get props :name))
-                      (pop-to (elswm-window:pop-to name)))
-                 (or (and pop-to
-                          (let ((win (elswm-window:emacs-window pop-to)))
-                            (when (window-live-p win)
-                              win)))
-                     (let* ((windows (window-list))
-                            (member  (member (selected-window) windows)))
-                       (cond ((> (length member ) 1) (cadr member))
-                             ((> (length windows) 1) (car windows))
-                             (t (split-window))))))))))
+               (elswm-window:display-buffer-emacs-window buf)
+               (elswm:display-buffer-function:default-window buf)))))
     (set-window-buffer win buffer)
     win))
 
@@ -78,10 +75,9 @@
     (eval `(progn (defadvice ,func (after  elswm:ad activate)
                     (elswm-window:onfocus))))))
 
-
 (defun elswm-ad:deactivate () (ad-deactivate-regexp "elswm.*"))
 
-(defun elswm-ad:activate () (ad-activate-regexp "elswm.*"))
+(defun elswm-ad:activate   () (ad-activate-regexp   "elswm.*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -113,7 +109,6 @@
                'elswm-elshook:after-goto)
   (remove-hook 'elscreen-screen-update-hook
                'elswm-elshook:modify-frame-color))
-
 
 (defun elswm-elshook:previous-kill ()
   (let ((screen (elscreen-get-current-screen)))

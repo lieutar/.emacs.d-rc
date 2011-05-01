@@ -19,4 +19,12 @@
         `(defun ,fun ()
            (elswm-frame:set-environment-name ',envn)
            (elswm-mode t)))))
+
+   (defadvice w3m-browse-url (around my-elswm-rc-ad first activate)
+     (save-window-excursion ad-do-it)
+     (pop-to-buffer "*w3m*"))
+
+   (add-to-list 'elswm-ad:select-window-functions
+                'w3m-browse-url)
+
    ))

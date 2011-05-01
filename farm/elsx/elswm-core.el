@@ -25,85 +25,24 @@
 ;;; Code:
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; elswm-env
-;;;
-
-(defun elswm-env-object:new (name directory)
-  (let ((self (vector 'elswm-env-object (list :name name :directory directory))))
-    self))
-
-(defun elswm-env-object-p (obj)
-  (and (vectorp obj)
-       (eq 'elswm-env-object (aref obj 0))))
-
-(defun elswm-env:name         (self) (plist-get (aref self 1) :name))
-(defun elswm-env:directory    (self) (plist-get (aref self 1) :directory))
-(defun elswm-env:init         (self)
-  (let ((self (elswm-frame frame))
-        (env-dir (expand-file-name (format "env/%s" env-name)
-                                   elswm-directory)))
-
-    (unless (file-exists-p env-dir)
-      (if (y-or-n-p
-           (format "environment directory %s is not exists. create? "
-                   env-dir))
-          (make-directory env-dir)
-        (error "abort")))
-
-    (unless (file-readable-p env-dir)
-      (error "environment directory %s is not readable." env-dir))
-
-    (unless (file-directory-p env-dir)
-      (error "%s is not directory." env-dir))
-
-    (plist-put (aref self 1) :environment-name env-name)
-
-    (dolist (file '("env.el"
-                    "init.el"))
-      (let ((init-file (expand-file-name file env-dir)))
-        (when (file-readable-p init-file)
-          (load-file init-file))))
-(defun elswm-env:layout-alist (self))
+(defmacro elswm-test (name &rest body)
+  `(eval-after-load "yatest"
+     '(yatest::define-test elswm ,name
+                           (progn ,@body))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; elswm-layout
-;;;
-(require 'elswm-layout-write)
-
-(defun elswm-read-layout-name ()
-  (let ((layout-name (car (elswm-screen:layout)))
-        name)
-    (while (null name)
-      (setq name (read-string "layout name: "
-                              (if (eq layout-name 'empty) ""
-                                (symbol-name layout-name))))
-      (when (equal name "empty") (setq name nil)))
-    name))
-
-(defun elswm-layout-file-name (name)
-  (expand-file-name
-   (format "env/%s/%s.layout"
-           (elswm-frame:environment-name)
-           name)
-   elswm-directory))
-
-
-
+(require 'elswm-config)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; elswm-frame
 ;;;
 
-
 (defun elswm-frame-object:new (frame)
   (let ((self (vector
                'elswm-frame-object
-               (list :frame (or frame (selected-frame))))))
+               (list :frame (or frame (selected-frame))
+                     :env   nil))))
     (modify-frame-parameters frame `((elswm . ,self)))
     self))
 
@@ -112,104 +51,49 @@
        (eq 'elswm-frame-object (aref obj 0))))
 
 (defun elswm-frame (&optional frame)
-  (cdr (or (assq 'elswm (frame-parameters frame))
-           (cons nil (elswm-frame-object:new frame)))))
+  (cond ((elswm-frame-object-p frame) frame)
+        ((or (null frame) (framep frame))
+         (cdr (or (assq 'elswm (frame-parameters frame))
+                  (cons nil (elswm-frame-object:new frame)))))
+        (t (error "illegal frame specifier: %S" frame))))
 
+(defun elswm-frame:environment (&optional frame)
+  (let ((self (elswm-frame frame)))
+    (plist-get (aref self 1) :environment)))
+
+(defun elswm-frame:set-environment (env &optional frame)
+  (let ((self (elswm-frame frame)))
+    (plist-put (aref self 1) :environment env)))
 
 (defun elswm-frame:environment-name (&optional frame)
   (let ((self (elswm-frame frame)))
-    (plist-get (aref self 1) :environment-name)))
+    (elswm-env:name (elswm-frame:environment self))))
 
 (defun elswm-frame:set-environment-name (env-name &optional frame)
-  (let ((self (elswm-frame frame))
-        (env-dir (expand-file-name (format "env/%s" env-name)
-                                   elswm-directory)))
-
-    (unless (file-exists-p env-dir)
-      (if (y-or-n-p
-           (format "environment directory %s is not exists. create? "
-                   env-dir))
-          (make-directory env-dir)
-        (error "abort")))
-
-    (unless (file-readable-p env-dir)
-      (error "environment directory %s is not readable." env-dir))
-
-    (unless (file-directory-p env-dir)
-      (error "%s is not directory." env-dir))
-
-    (plist-put (aref self 1) :environment-name env-name)
-
-    (dolist (file '("env.el"
-                    "init.el"))
-      (let ((init-file (expand-file-name file env-dir)))
-        (when (file-readable-p init-file)
-          (load-file init-file))))
-
-    (when nil
-      (condition-case err
-          (let ((layouts (plist-get (aref self 1) :initial-layouts))
-                (screen-list (elscreen-get-screen-list)))
-            (loop for screen from 0 to (length layouts)
-                  for layout in layouts do
-                  (progn
-                    (message "%s %s" screen layout)
-                    (if (memq screen screen-list)
-                        (elscreen-goto screen)
-                      (elscreen-create))
-                    (message "OK!"))))
-        (error (message "%S" err))))))
-
+  (elswm-frame:set-environment
+    (elswm-env env-name (elswm-config elswm-directory)) frame))
 
 (defun elswm-frame:set-initial-layouts (layouts &optional frame)
   (let ((self (elswm-frame frame)))
     (plist-put (aref self 1) :initial-layouts layouts)))
 
-
 (defun elswm-frame:get-environment-directory (&optional frame)
-  (let* ((self (elswm-frame frame))
-         (envn (elswm-frame:environment-name)))
-    (when envn
-      (expand-file-name (format "env/%s" envn)
-                        elswm-directory))))
-
+  (let* ((self (elswm-frame frame)))
+    (elswm-env:directory (elswm-frame:environment self))))
 
 (defun elswm-frame:layout-alist (&optional frame)
-  (let ((dir (elswm-frame:get-environment-directory frame)))
-    (when dir
-      (apply 'append
-             (list (list "empty"))
-             (mapcar (lambda (file)
-                       (when (string-match "\\(.+?\\)\\.layout\\'" file)
-                         (list (list (intern (match-string 1 file))))))
-                     (directory-files dir))))))
+  (let* ((self (elswm-frame frame)))
+    (elswm-env:layout-alist (elswm-frame:environment self))))
 
 (defun elswm-frame:get-layout (name &optional frame)
-  (if (eq name 'empty)
-      (list 'empty)
-    (or (loop for layoutn in (list name 'default) do
-              (let* ((dir     (elswm-frame:get-environment-directory frame))
-                     (layoutf (expand-file-name (format "%s.layout" layoutn)
-                                                dir)))
-                (when (file-readable-p layoutf)
-                  (with-temp-buffer
-                    (insert-file-contents layoutf)
-                    (condition-case nil
-                        (return (cons name
-                                      (read (buffer-substring-no-properties
-                                             (point-min) (point-max)))))
-                       (error
-                        (message "Malformed layout file: %s" layoutf)
-                        nil))))))
-        (and (eq name 'default)
-             (list name)))))
+  (let* ((self (elswm-frame frame))
+         (env  (elswm-frame:environment self)))
+    (when env (elswm-env:get-layout name env))))
 
 (defun elswm-frame:read-layout-name (&optional frame)
-  (intern
-   (completing-read "which layout? "
-                    (elswm-frame:layout-alist frame)
-                    nil t)))
-
+  (completing-read "which layout? "
+                   (elswm-frame:layout-alist frame)
+                   nil t))
 
 (defun elswm-frame:get-screen-layout (&optional screen frame)
   (let* ((self    (elswm-frame frame))
@@ -317,7 +201,6 @@
 (defun elswm-screen:kill (&optional screen frame)
   (elswm-frame:drop-screen (or screen (elscreen-get-current-screen))))
 
-
 (defun elswm-screen:initialized (&optional screen frame)
   (plist-get (aref (elswm-screen screen frame) 1) :initialized))
 
@@ -383,9 +266,65 @@
   (let ((obj (elswm-window window screen frame)))
     (when obj (aref obj  1))))
 
+(defun elswm-window:put (keyword value &optional window screen frame)
+  (let ((self (elswm-window window screen frame)))
+    (unless self (error "unknown window %S %S %S" window screen frame))
+    (let ((attrs (elswm-window:attributes self)))
+      (if (plist-member attrs keyword)
+          (plist-put attrs keyword value)
+        (nconc attrs (list keyword value)))
+      value)))
+
+(defun elswm-window:get (keyword &optional window screen frame)
+  (let ((self (elswm-window window screen frame)))
+    (unless self (error "unknown window %S %S %S" window screen frame))
+    (plist-get (elswm-window:attributes self) keyword)))
+
 (defun elswm-window:pop-to (&optional window screen frame)
   (or (plist-get (elswm-window:attributes window screen frame):pop-to)
       (elswm-screen:get-pop-to screen frame)))
+
+(defun elswm-window:display-buffer-emacs-window:spec2win (spec buf self)
+  (when spec
+    (cond 
+     ((symbolp spec)
+      (let ((win (elswm-window:emacs-window spec)))
+        (when (window-live-p win)
+          win)))
+     ((listp spec)
+      (let ((mode-symbol 'default)
+            (candidates
+             (if (keywordp (car spec))
+                 (let* ((mode (save-excursion (set-buffer buf) major-mode))
+                        (mode-specific  (plist-get spec :mode))
+                        (mode-candidate (get-alist mode mode-specific)))
+                   (if mode-candidate
+                       (progn (setq mode-symbol mode)
+                              mode-candidate)
+                     (plist-get spec :default)))
+               spec)))
+        (when candidates
+          (if (= 1 (length candidates))
+              (elswm-window:display-buffer-emacs-window:spec2win
+               (car candidates) buf self)
+            (let* ((counter  (elswm-window:get :pop-to-counter self))
+                   (count    (or (plist-get counter mode-symbol) 0))
+                   (win-spec (nth count candidates)))
+              (setq count (mod (1+ count) (length candidates)))
+              (if (plist-member counter mode-symbol)
+                  (plist-put counter mode-symbol count)
+                (if (null counter)
+                    (elswm-window:put :pop-to-counter (list mode-symbol count)
+                                      self)
+                  (nconc counter (list mode-symbol count))))
+              (elswm-window:display-buffer-emacs-window:spec2win
+               win-spec buf self)))))))))
+
+(defun elswm-window:display-buffer-emacs-window (buf
+                                                 &optional window screen frame)
+  (let* ((self (elswm-window window screen frame))
+         (pop-to (elswm-window:pop-to self)))
+    (elswm-window:display-buffer-emacs-window:spec2win pop-to buf self)))
 
 (defun elswm-window:emacs-window (&optional window screen frame)
   (plist-get (elswm-window:attributes window screen frame) :window))
@@ -402,6 +341,6 @@
                (car attrs) (cadr attrs))
     (setq attrs cddr attrs)))
 
-
 (provide 'elswm-core)
-;;; elswm-core.el ends here
+;;; elswm-core.el ends here 
+

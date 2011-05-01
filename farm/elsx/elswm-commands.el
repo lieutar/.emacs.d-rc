@@ -29,7 +29,7 @@
 
 (defun elswm-layout-save ( name &optional frame )
   (interactive (list (elswm-read-layout-name)))
-  (let ((layout-file (elswm-layout-file-name)))
+  (let ((layout-file (elswm-layout-file-name name)))
     (with-temp-buffer
       (elswm-layout-write frame)
       (setq buffer-file-name layout-file)
@@ -64,6 +64,9 @@
 
 (defalias 'elswm:create 'elswm-create)
 
+(defun elswm-force-onfocus ()
+  (interactive)
+  (elswm-window:onfocus))
 
 (defun elswm-initialize-window-interactive (cmd)
   (interactive (list (read-command "M-x: ")))
