@@ -43,7 +43,7 @@
            cygstartsrv/server-port)))
   cygstartsrv/stream)
 
-(defun cygstartsrv/browse-url (url)
+(defun cygstartsrv/browse-url (url &optional new-window)
   (let ((proc (cygstartsrv/get-process)))
     (process-send-string proc (concat url "\n"))))
 

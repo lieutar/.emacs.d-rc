@@ -5,7 +5,9 @@
 (rc-load "load-path")
 
 (require 'rc-ext) ;; 拡張設定用ライブラリの読み込み
+(rc-load "colinux")
 (rc-ext :name 'acman )
+
 
 (rc-load "frame")
 (rc-load "cygwin")

@@ -13,23 +13,24 @@
  :preload
  (lambda ()
 
-
-   (setq browse-url-browser-function 
-         `((,(concat
-              "^" (regexp-opt
-                   '("http://www.google.com/reader/"
-                     "http://maps.google.co.jp/"
-                     "http://map.yahoo.co.jp/"
-                     "http://map.labs.goo.ne.jp/"
-                     "http://www.haloscan.com/"
-                     "http://sitemeter.com/"
-                     "http://www.hmv.co.jp/"
-                     "http://h.hatena.ne.jp/"
-                     "http://h1beta.hatena.ne.jp/"
-                     "http://twitter.com/"
-                     )))
-            . my-rc-browse-url-default-browser-function)
-           ("." . w3m-browse-url)))
+   (when nil
+     (setq browse-url-browser-function 
+           `((,(concat
+                "^" (regexp-opt
+                     '("http://www.google.com/reader/"
+                       "http://maps.google.co.jp/"
+                       "http://map.yahoo.co.jp/"
+                       "http://map.labs.goo.ne.jp/"
+                       "http://www.haloscan.com/"
+                       "http://sitemeter.com/"
+                       "http://www.hmv.co.jp/"
+                       "http://h.hatena.ne.jp/"
+                       "http://h1beta.hatena.ne.jp/"
+                       "http://twitter.com/"
+                       )))
+              . my-rc-browse-url-default-browser-function)
+             ("." . w3m-browse-url)))
+     )
    )
  :on-load-error
  (lambda ()
