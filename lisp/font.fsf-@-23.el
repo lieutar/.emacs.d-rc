@@ -60,16 +60,29 @@
       )
     ))
 
-(my-rc-init-font
-;; :base  "Consolas";; :ja    "ＭＳ ゴシック"
- :base  "さざなみゴシック";; :ja    "ＭＳ ゴシック"
-;; :base "メイリオ" :ja "メイリオ"
-;; :base  "IPAゴシック"  :ja    "IPAゴシック"
- :height 75
- :rescale-alist
- '((".*ＭＳ.*bold.*iso8859.*" . 0.8)
-   (".*ＭＳ.*bold.*jisx02.*"  . 0.8)))
-
+(cond 
+ ((equal system-name "cotreefrog")
+    (my-rc-init-font
+     :base  "IPAGothic"
+;;     :base  "さざなみゴシック";; :ja    "ＭＳ ゴシック"
+     :height 80
+     :rescale-alist
+     '((".*iso8858.*" . 0.8)
+       (".*jisx02.*" . 0.8)))
+    )
+ ((equal system-name "comisuzu")
+  )
+ (t
+  (my-rc-init-font
+   ;; :base  "Consolas";; :ja    "ＭＳ ゴシック"
+   :base  "さざなみゴシック";; :ja    "ＭＳ ゴシック"
+   ;; :base "メイリオ" :ja "メイリオ"
+   ;; :base  "IPAゴシック"  :ja    "IPAゴシック"
+   :height 75
+   :rescale-alist
+   '((".*ＭＳ.*bold.*iso8859.*" . 0.8)
+   (".*ＭＳ.*bold.*jisx02.*"  . 0.8)))))
+  
 
 
 ;あああああああああああああああああああああああああああああああああああああああ
@@ -82,7 +95,13 @@
 (modify-frame-parameters
  (selected-frame)
  (setq default-frame-alist
-       (append `((height . ,(rc-emacsen-case (fsf-nt-23     72)
-                                             (fsf-cygwin-23 75))))
+       (append `((height . ,(rc-emacsen-case 
+                             (fsf-nt-23     72)
+                             (fsf-cygwin-23 75)
+                             (fsf-unicom-23
+                              (cond
+                               ((equal system-name "cotreefrog")
+                                74)))
+                             )))
                  default-frame-alist)))
 

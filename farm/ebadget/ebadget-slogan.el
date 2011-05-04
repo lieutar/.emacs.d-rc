@@ -6,7 +6,7 @@
 
 (make-face 'ebadget:slogan:face)
 (set-face-attribute 'ebadget:slogan:face nil
-                    :font          "DFPMaruGothic-Md"
+;;                    :font          "DFPMaruGothic-Md"
                     :height        3.0
                     :weight        'normal
                     :inverse-video nil

@@ -8,7 +8,7 @@
       :timeout 5
       :default-action 
       (lambda ()
-        (let ((width (cdr (assq 'width (frame-parameters nil)))))
+        (let ((width (frame-parameter nil 'width)))
           (cond 
            ((>= width 250)
             (my-rc-3cols-environment))

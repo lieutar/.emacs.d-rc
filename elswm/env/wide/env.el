@@ -1,2 +1,2 @@
-(elswmy-frame:set-initial-layouts  '(main twit default))
+(elswm-frame:set-initial-layouts  '(main twit default))
 

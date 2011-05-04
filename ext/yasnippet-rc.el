@@ -12,7 +12,10 @@
 ;;              yas/new-snippet
 ;;              yas/load-snippet-buffer
 ;;              yas/tryout-snippet)
- :get (lambda () (browse-url "http://code.google.com/p/yasnippet/"))
+ :get (lambda () 
+        (browse-url "http://code.google.com/p/yasnippet/")
+        (rc-get "http://www.emacswiki.org/cgi-bin/wiki/download/dropdown-list.el")
+        )
  :init
  (lambda ()
    (setq yas/root-directory "~/.emacs.d/templates/snippet")
@@ -38,4 +41,5 @@
      (yas/expand-link (completing-read "Select template: " keys nil t)))
    ;; (yas/expand-link-choice "defgp" "defcm")
 
+   t
    ))

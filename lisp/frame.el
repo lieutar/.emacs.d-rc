@@ -1,3 +1,4 @@
+;; 
 (rc-load "font")
 
 (modify-frame-parameters
@@ -11,7 +12,11 @@
         (when (> (x-display-pixel-width) 800)
           `((width  . ,(rc-emacsen-case 
                         (@-cygwin-23 252)
-                        (t           166)))))
+                        (t           
+                         (cond
+                          ((equal system-name "cotreefrog")
+                           251)
+                          (t 166)))))))
 
         (rc-emacsen-case
          (fsf-cygwin-@
@@ -25,10 +30,10 @@
 
 (rc-emacsen-case
  (@-@-23
-  (setq tool-bar-mode t)
-  (tool-bar-mode nil)))
+  (tool-bar-mode -1)))
 
 ;;(let ((params (frame-parameters (selected-frame)))) (assq (intern (completing-read "prop: " params)) params))
 ;;(emacs-pid)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
