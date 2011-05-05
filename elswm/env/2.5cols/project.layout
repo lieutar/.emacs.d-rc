@@ -1,0 +1,64 @@
+;-*-emacs-lisp-*-
+(
+ :composition
+ ((- :size 256)
+   ((| :size 4)
+     (:name nil
+      :size 85
+      :init nil
+      :onfocus nil
+      :pop-to nil)
+     (:name nil
+      :size 171
+      :init nil
+      :onfocus nil
+      :pop-to nil))
+   ((| :size 62)
+     ((- :size 85)
+       (:name nil
+        :size 52
+        :init (lambda ()
+                (find-file "/home/lieutar/.emacs.d/rc/farm/elsx/elswm-layout-write.el")
+                (goto-char 1192))
+        :onfocus nil
+        :pop-to nil)
+       (:name nil
+        :size 10
+        :init (lambda ()
+                (find-file "/home/lieutar/.emacs.d/rc/farm/elsx/elswm-commands.el")
+                (goto-char 1152))
+        :onfocus nil
+        :pop-to nil))
+     ((- :size 85)
+       (:name nil
+        :size 52
+        :init (lambda ()
+                (find-file "/home/lieutar/.emacs.d/rc/farm/elsx/elswm.el")
+                (goto-char 1947))
+        :onfocus nil
+        :pop-to nil)
+       (:name nil
+        :size 10
+        :init (lambda ()
+                (switch-to-buffer "*scratch*"))
+        :onfocus nil
+        :pop-to nil))
+     ((- :size 86)
+       (:name nil
+        :size 52
+        :init (lambda ()
+                (switch-to-buffer "*Messages*"))
+        :onfocus nil
+        :pop-to nil)
+       (:name nil
+        :size 10
+        :init (lambda ()
+                (switch-to-buffer "*scratch*"))
+        :onfocus nil
+        :pop-to nil)))
+   (:name nil
+    :size 8
+    :init nil
+    :onfocus nil
+    :pop-to nil))
+)
