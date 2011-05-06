@@ -24,27 +24,45 @@
 
 ;;; Code:
 
-(defun elswm-util:ws-vertically (size window op)
-  (let* ((window (cond ((null    window) (selected-window))
-                       ((windowp window) window)
-                       ((symbolp window) 
-                        (let ((wplist (elswm-window:attributes window)))
-                          (unless wplist (error "undefined window: %s" window))
-                          (plist-get wplist :window)))))
-         (size   (if (> size 0) size (+ size (frame-parameter
-                                              (window-frame window) 'height))))
-        (height (window-height window)))
-    (when (funcall op height size)
+(defun elswm-util:ws-vh (size window op dir)
+  (let*
+      ((syms       (if (eq dir 'vertical)
+                       '(height nil window-height)
+                     '(width t window-width)))
+       (size-prop       (car syms))
+       (horizontally    (cadr syms))
+       (get-window-size (caddr syms))
+       (window     (cond ((null    window) (selected-window))
+                         ((windowp window) window)
+                         ((symbolp window) 
+                          (let ((wplist (elswm-window:attributes window)))
+                            (unless wplist
+                              (error "undefined window: %s" window))
+                            (plist-get wplist :window)))))
+
+       (size   (if (> size 0) size (+ size (frame-parameter
+                                            (window-frame window) 
+                                            size-prop))))
+       (window-size
+        (funcall get-window-size window)))
+
+    (when (funcall op window-size size)
       (let ((back-to (selected-window)))
         (select-window window)
-        (enlarge-window (- size height))
+        (enlarge-window (- size window-size) horizontally)
         (select-window back-to)))))
 
-(defun elswm-util:widen-vertically (size &optional window)
-  (elswm-util:ws-vertically size window '<))
 
+(defun elswm-util:widen-vertically (size &optional window)
+  (elswm-util:ws-vh size window '< 'vertical))
 (defun elswm-util:shlink-vertically (size &optional window)
-  (elswm-util:ws-vertically size window '>))
+  (elswm-util:ws-vh size window '> 'vertical))
+
+(defun elswm-util:widen-horizontally (size &optional window)
+  (elswm-util:ws-vh size window '< 'horizontal))
+(defun elswm-util:shlink-horizontally (size &optional windos)
+  (elswm-util:ws-vh size window '> 'horizontal))
+
 
 (defun elswm-util:3cols:init-with-eshell (dir)
   (switch-to-buffer
