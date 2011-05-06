@@ -2,7 +2,7 @@
  :class 'git
  :name  'magit
  :load  'magit
- :get   (lambda () (browse-url "http://philjackson.github.com/magit/"))
+ :get   (lambda () (browse-url "https://github.com/magit/magit/downloads"))
  :autoload '(magit-status
              magit-init)
  :preload (lambda ()

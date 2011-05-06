@@ -16,6 +16,8 @@
                          (cond
                           ((equal system-name "cotreefrog")
                            251)
+                          ((equal system-name "comisuzu")
+                           251)
                           (t 166)))))))
 
         (rc-emacsen-case

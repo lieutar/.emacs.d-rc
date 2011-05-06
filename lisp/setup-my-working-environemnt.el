@@ -12,6 +12,8 @@
           (cond 
            ((>= width 250)
             (my-rc-3cols-environment))
+           ((>= width 200)
+            (my-rc-2.5cols-environment))
            ((>= width 164)
             (my-rc-wide-screen-environment))
            (t

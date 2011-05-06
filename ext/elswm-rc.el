@@ -11,6 +11,7 @@
    (global-set-key (kbd "C-x 5 2") 'elswm:temporary-frame:open)
    
    (dolist (conf '((3cols         3cols)
+                   (2.5cols       2.5cols)
                    (wide-screen   wide)
                    (narrow-screen narrow)))
      (let ((fun  (intern (format "my-rc-%s-environment" (car conf))))
