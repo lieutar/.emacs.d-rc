@@ -9,7 +9,8 @@
      (rc-menu:confirm
       :timeout 5
       :default-action 
-      (run-hooks 'my-working-environment-hook)))
+      (lambda ()
+        (run-hooks 'my-working-environment-hook))))
    
    (add-hook 'after-init-hook 'setup-my-working-environment:confirm)
 

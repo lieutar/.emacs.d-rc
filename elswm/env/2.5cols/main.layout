@@ -20,12 +20,15 @@
          :init (lambda () (elswm-util:3cols:init-with-eshell "~"))))
  
  ((-)
+
+  ((| :size 4)
+   (:name slogan
+    :init (lambda () ))
+   (:name clock
+    :init  (lambda ()(ebadget:clock))))
+
   ((| :size 50)
    ((- :size 84)
-
-    (:size 4
-     :name slogan
-     :init (lambda () (ebadget:slogan)))
 
     (:name  agenda
      :init (lambda ()
@@ -36,9 +39,6 @@
                (and (re-search-forward "^\\*\\* Log" nil t)
                     (beginning-of-line))))))
    ((-)
-    (:size 4
-     :name clock
-     :init (lambda () (ebadget:clock)))
 
     (:name jweather
      :init (lambda () (jweather:gadget)))

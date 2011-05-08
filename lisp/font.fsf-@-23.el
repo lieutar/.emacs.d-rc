@@ -71,6 +71,12 @@
        (".*jisx02.*" . 0.8)))
     )
  ((equal system-name "comisuzu")
+    (my-rc-init-font
+     :base  "IPAGothic"
+     :height 80
+     :rescale-alist
+     '((".*iso8858.*" . 0.8)
+       (".*jisx02.*" . 0.8)))
   )
  (t
   (my-rc-init-font
@@ -101,7 +107,9 @@
                              (fsf-unicom-23
                               (cond
                                ((equal system-name "cotreefrog")
-                                74)))
-                             )))
+                                74)
+                               ((equal system-name "comisuzu")
+                                75))
+                             ))))
                  default-frame-alist)))
 
